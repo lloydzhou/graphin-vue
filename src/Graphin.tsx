@@ -7,7 +7,7 @@ import GraphinType  from '@antv/graphin/es/Graphin';
 import ApiController from '@antv/graphin/es/apis';
 import { ApisType } from '@antv/graphin/es/apis/types';
 /** 内置 Behaviors */
-// import Behaviors from './behaviors';
+import Behaviors from './behaviors';
 import { DEFAULT_TREE_LATOUT_OPTIONS, TREE_LAYOUTS } from '@antv/graphin/es/consts';
 /** Context */
 // import GraphinContext from './GraphinContext';
@@ -22,9 +22,8 @@ import cloneDeep from '@antv/graphin/es/utils/cloneDeep';
 // import shallowEqual from './utils/shallowEqual';
 import deepEqual from '@antv/graphin/es/utils/deepEqual';
 
-// const { DragCanvas, ZoomCanvas, DragNode, DragCombo, ClickSelect, BrushSelect, ResizeCanvas } = Behaviors;
+const { DragCanvas, ZoomCanvas, DragNode, DragCombo, ClickSelect, BrushSelect, ResizeCanvas } = Behaviors;
 import {createContext} from './GraphinContext'
-import ResizeCanvas from './behaviors/ResizeCanvas'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type DiffValue = any;
@@ -40,21 +39,6 @@ export interface GraphinState {
     updateContext: (config: PlainObject) => void;
   };
 }
-
-// const T = {
-//   style?: CSSProperties;
-//   theme?: Partial<ThemeType>;
-//   data: GraphinTreeData | GraphinData;
-//   layout?: Layout;
-//   modes?: any;
-//   handleAfterLayout?: (graph: Graph) => void;
-//   /** 宽度 */
-//   width: number;
-//   /** 高度 */
-//   height: number;
-// }
-// 
-// export type VGraphinProps = ExtractPropTypes<typeof T>;
 
 export interface RegisterFunction {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -162,6 +146,7 @@ const Graphin = defineComponent({
       apis: {} as ApisType,
       theme: {} as ThemeData,
       layout: {} as LayoutController,
+      dragNodes: [] as IUserNode[],
     })
     createContext(context)
 
@@ -285,6 +270,7 @@ const Graphin = defineComponent({
       context.apis = self.apis
       context.theme = self.theme
       context.layout = self.layout
+      context.dragNodes = self.dragNodes
       /** 设置Context */
       // 使用
       // this.setState({
@@ -358,9 +344,132 @@ const Graphin = defineComponent({
       self.graph!.destroy();
     };
 
+    const shouldUpdate = (prevProps: GraphinProps, key: string) => {
+      const prevVal = prevProps[key];
+      const currentVal = self.props[key] as DiffValue;
+      const isEqual = deepEqual(prevVal, currentVal);
+      return !isEqual;
+    }
+
     onMounted(() => {
       nextTick(() => initGraphInstance())
       watchEffect((onInvalidate) => {
+        const isDataChange = shouldUpdate(self.props, 'data');
+        const isLayoutChange = shouldUpdate(self.props, 'layout');
+        const isOptionsChange = shouldUpdate(self.props, 'options');
+        const isThemeChange = shouldUpdate(self.props, 'theme');
+        // console.timeEnd('did-update');
+        const { data, layoutCache, layout } = props;
+        self.layoutCache = layoutCache;
+        // const isGraphTypeChange = (prevProps.data as GraphinTreeData).children !== (data as GraphinTreeData).children;
+
+        if (isThemeChange) {
+          // TODO :Node/Edge/Combo 批量调用 updateItem 来改变
+        }
+
+        /** 图类型变化 */
+        // if (isGraphTypeChange) {
+        //   console.error(
+        //     'The data types of pervProps.data and props.data are inconsistent,Graphin does not support the dynamic switching of TreeGraph and NetworkGraph',
+        //   );
+        //   return;
+        // }
+
+        /** 配置变化 */
+        if (isOptionsChange) {
+          // this.updateOptions();
+        }
+
+        /** 数据变化 */
+        if (isDataChange) {
+          initData(data as GraphinProps["data"]);
+
+          if (self.isTree) {
+            // this.graph.data(this.data as TreeGraphData);
+            self.graph.changeData(self.data as TreeGraphData);
+          } else {
+            const { dragNodes } = context
+            // 更新拖拽后的节点的mass到data
+            // @ts-ignore
+            self.data?.nodes?.forEach(node => {
+              const dragNode = dragNodes.find(item => item.id === node.id);
+              if (dragNode) {
+                node.layout = {
+                  ...node.layout,
+                  force: {
+                    mass: dragNode.layout?.force?.mass,
+                  },
+                };
+              }
+            });
+
+            self.graph.data(self.data as GraphData | TreeGraphData);
+            self.graph.set('layoutController', null);
+            self.graph.changeData(self.data as GraphData | TreeGraphData);
+
+            // 由于 changeData 是将 this.data 融合到 item models 上面，因此 changeData 后 models 与 this.data 不是同一个引用了
+            // 执行下面一行以保证 graph item model 中的数据与 this.data 是同一份
+            // @ts-ignore
+            self.data = self.layout.getDataFromGraph();
+            self.layout.changeLayout();
+          }
+
+          initStatus();
+          self.apis = ApiController(self.graph as IGraph);
+          // 模拟setState
+          context.graph = self.graph
+          context.apis = self.apis
+          context.theme = self.theme
+          context.layout = self.layout
+          context.dragNodes = self.dragNodes
+          // console.log('%c isDataChange', 'color:grey');
+          // this.setState(
+          //   preState => {
+          //     return {
+          //       ...preState,
+          //       context: {
+          //         graph: this.graph,
+          //         apis: this.apis,
+          //         theme: this.theme,
+          //         layout: this.layout,
+          //         dragNodes: preState.context.dragNodes,
+          //         updateContext: this.updateContext,
+          //       },
+          //     };
+          //   },
+          //   () => {
+          //     this.graph.emit('graphin:datachange');
+          //     if (isLayoutChange) {
+          //       this.graph.emit('graphin:layoutchange', { prevLayout: prevProps.layout, layout });
+          //     }
+          //   },
+          // );
+          // return;
+        }
+        /** 布局变化 */
+        if (isLayoutChange) {
+          if (self.isTree) {
+            // @ts-ignore
+            self.graph.updateLayout(props.layout);
+            return;
+          }
+          /**
+           * TODO
+           * 1. preset 前置布局判断问题
+           * 2. enablework 问题
+           * 3. G6 LayoutController 里的逻辑
+           */
+          /** 数据需要从画布中来 */
+          // @ts-ignore
+          self.data = self.layout.getDataFromGraph();
+          self.layout.changeLayout();
+          self.layout.refreshPosition();
+
+          /** 走G6的layoutController */
+          // this.graph.updateLayout();
+          // console.log('%c isLayoutChange', 'color:grey');
+          self.graph.emit('graphin:layoutchange', { prevLayout: self.props.layout, layout });
+        }
         onInvalidate(() => {
           clear()
         })
@@ -382,6 +491,25 @@ const Graphin = defineComponent({
         <div class="graphin-components">
           {/** @ts-ignore */}
           {self.isReady && <>
+            {
+              /** @ts-ignore modes 不存在的时候，才启动默认的behaviors，否则会覆盖用户自己传入的 */
+              !props.modes && (
+                <>
+                  {/* 拖拽画布 */}
+                  <DragCanvas />
+                  {/* 缩放画布 */}
+                  <ZoomCanvas />
+                  {/* 拖拽节点 */}
+                  <DragNode />
+                  {/* 点击节点 */}
+                  <DragCombo />
+                  {/* 点击节点 */}
+                  <ClickSelect />
+                  {/* 圈选节点 */}
+                  <BrushSelect />
+                </>
+              )
+            }
             {slots.default ? slots.default() : null}
             {/** resize 画布 */}
             <ResizeCanvas graphDOM={self.graphDOM as HTMLDivElement} />
@@ -522,14 +650,6 @@ const Graphin = defineComponent({
   //  */
   // componentDidCatch(error: Error, info: ErrorInfo) {
   //   console.error('Catch component error: ', error, info);
-  // }
-
-  // shouldUpdate(prevProps: GraphinProps, key: string) {
-  //   /* eslint-disable react/destructuring-assignment */
-  //   const prevVal = prevProps[key];
-  //   const currentVal = this.$attrs[key] as DiffValue;
-  //   const isEqual = deepEqual(prevVal, currentVal);
-  //   return !isEqual;
   // }
 
     // return (

@@ -92,7 +92,12 @@ export default class App extends Component {
     setTimeout(() => this.name = 'lloyd', 2000)
     console.log('created', this)
     // @ts-ignore
-    this.data = Utils.mock(10).circle().graphin()
+    this.data = Utils.mock(20).circle().graphin()
+    setTimeout(() => {
+      // @ts-ignore
+      this.data = Utils.mock(20).circle().graphin()
+      console.log('update data', this.data)
+    }, 3000)
   }
 
 }

@@ -29,6 +29,9 @@ const ResizeCanvas = defineComponent({
           graph!.autoPaint()
         }
       }, 200)
+      /** 先执行一次 */
+      handleResizeEvent()
+
       /** 内置 drag force node */
       window.addEventListener('resize', handleResizeEvent, false)
       onInvalidate(() => {

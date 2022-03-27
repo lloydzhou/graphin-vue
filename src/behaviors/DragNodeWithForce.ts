@@ -54,8 +54,8 @@ const DragNodeWithForce = defineComponent({
         graph.off('node:dragstart', handleNodeDragStart)
         graph.off('node:dragend', handleNodeDragEnd)
       })
-      return () => null
     })
+    return () => null
   }
 })
 
