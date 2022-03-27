@@ -18,6 +18,9 @@
     "paths": {
       "@/*": [
         "src/*"
+      ],
+      "@antv/graphin/*": [
+        "node_modules/@antv/graphin/*"
       ]
     },
     "lib": [
