@@ -1,6 +1,5 @@
 // @ts-nocheck
 import { defineComponent, onMounted, onUnmounted, ref, provide, inject, reactive, nextTick, toRef, toRefs, ExtractPropTypes, PropType, CSSProperties, shallowReactive, watchEffect, watch, toRaw, shallowRef, computed } from 'vue';
-import { omit } from 'lodash'
 
 import G6, { Graph as IGraph, GraphData, GraphOptions, TreeGraphData } from '@antv/g6';
 // import React, { ErrorInfo } from 'react';
@@ -26,26 +25,9 @@ import deepEqual from '@antv/graphin/es/utils/deepEqual';
 
 const { DragCanvas, ZoomCanvas, DragNode, DragCombo, ClickSelect, BrushSelect, ResizeCanvas } = Behaviors;
 import {createContext} from './GraphinContext'
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type DiffValue = any;
-
-export interface GraphinState {
-  isReady: boolean;
-  context: {
-    graph: IGraph;
-    apis: ApisType;
-    theme: ThemeData;
-    layout: LayoutController;
-    dragNodes: IUserNode[];
-    updateContext: (config: PlainObject) => void;
-  };
-}
-
-export interface RegisterFunction {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (name: string, options: { [key: string]: any }, extendName?: string): void;
-}
+// import { omit } from 'lodash'
+import omit from 'lodash/omit'
+// const omit = require('lodash/omit')
 
 const Graphin = defineComponent({
   registerNode (nodeName: string, options: { [key: string]: any }, extendedNodeName?: string) {
@@ -84,7 +66,7 @@ const Graphin = defineComponent({
           console.error(`%c fontFamily:${fontFamily},does not found ${propKey} icon`);
           return '';
         }
-        return matchIcon?.unicode;
+        return matchIcon ? matchIcon.unicode : null;
       },
     });
   },
@@ -342,8 +324,9 @@ const Graphin = defineComponent({
         console.log('dataChange')
         if (!deepEqual(toRaw(v), toRaw(data.value))) {
           initData(v);
-          graph.value.data(toRaw(data.value) as GraphData | TreeGraphData);
-          graph.value.changeData(toRaw(data.value) as GraphData | TreeGraphData);
+          const newData = toRaw(data.value)
+          graph.value.data(newData as GraphData | TreeGraphData);
+          graph.value.changeData(newData as GraphData | TreeGraphData);
           layout.value.changeLayout();
           initStatus();
           apis.value = ApiController(toRaw(graph.value) as IGraph);
@@ -379,22 +362,29 @@ const Graphin = defineComponent({
     onUnmounted(() => {
       clear();
     });
-
-    return () => (
+    return {
+      graphDOM,
+      themeRef: theme,
+      isReady,
+    }
+  },
+  render() {
+    const { themeRef, graphStyle, isReady, modes, graphDOM } = this;
+    return (
       <div id="graphin-container">
         <div
           data-testid="custom-element"
           class="graphin-core"
-          ref={ref => graphDOM.value = ref}
-          style={{ background: theme.value?.background, ...props.graphStyle }}
+          ref="graphDOM"
+          style={{ background: themeRef.value ? themeRef.value.background : undefined, ...graphStyle }}
         />
         <div class="graphin-components">
           {/** @ts-ignore */}
           {isReady.value && <>
             {
               /** @ts-ignore modes 不存在的时候，才启动默认的behaviors，否则会覆盖用户自己传入的 */
-              !props.modes && (
-                <>
+              !modes && (
+                <div>
                   {/* 拖拽画布 */}
                   <DragCanvas />
                   {/* 缩放画布 */}
@@ -407,10 +397,10 @@ const Graphin = defineComponent({
                   <ClickSelect />
                   {/* 圈选节点 */}
                   <BrushSelect />
-                </>
+                </div>
               )
             }
-            {slots.default ? slots.default() : null}
+            {this.$slots.default ? this.$slots.default() : null}
             {/** resize 画布 */}
             <ResizeCanvas graphDOM={graphDOM.value as HTMLDivElement} />
           </>}
