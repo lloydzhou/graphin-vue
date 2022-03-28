@@ -1,14 +1,14 @@
+// @ts-nocheck
+import Graphin from './Graphin'
 
-import Graphin from './Graphin.vue'
-
-import registerGraphinForce from './layout/inner/registerGraphinForce';
-import registerPresetLayout from './layout/inner/registerPresetLayout';
-import { registerGraphinCircle, registerGraphinLine } from './shape';
-import {registerNode, registerEdge, registerCombo, registerBehavior, registerFontFamily} from "./register/index"
 //utils 工具
-import Utils from "./utils/index"
-import Behaviors from './behaviors/index';
+import Utils from "@antv/graphin/es/utils/index"
+import Behaviors from '@antv/graphin/es/behaviors/index';
 
+import registerGraphinForce from '@antv/graphin/es/layout/inner/registerGraphinForce';
+import registerPresetLayout from '@antv/graphin/es/layout/inner/registerPresetLayout';
+import { registerGraphinCircle, registerGraphinLine } from '@antv/graphin/es/shape';
+// import {registerNode, registerEdge, registerCombo, registerBehavior, registerFontFamily} from "@antv/graphin/es/register/index"
 // install 是默认的方法。当外界在 use 这个组件的时候，就会调用本身的 install 方法，同时传一个 Vue 这个类的参数。
 const components = [
   Graphin,
@@ -32,21 +32,29 @@ registerGraphinLine();
 
 /* istanbul ignore if */
 if (typeof window !== 'undefined' && window.Vue) {
-  VGraphin.install(window.Vue);
+  Graphin.install(window.Vue);
 }
 //导出
-export default VGraphin
+export default Graphin
 export {
-  VGraphin,
+  Graphin,
   Utils,
   Behaviors,
-  registerNode,
-  registerEdge,
-  registerCombo,
-  registerBehavior,
-  registerFontFamily
+  // registerNode,
+  // registerEdge,
+  // registerCombo,
+  // registerBehavior,
+  // registerFontFamily
 }
 export {
   /** export G6 */
   default as G6,
 } from "@antv/g6"
+
+export interface GraphEvent extends MouseEvent {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  item: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  target: any;
+}
+

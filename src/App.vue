@@ -103,6 +103,11 @@ export default class App extends Component {
       this.data = Utils.mock(10).circle().graphin()
       console.log('update data', this.data)
     }, 3000)
+    setTimeout(() => {
+      // @ts-ignore
+      this.data = Utils.mock(100).circle().graphin()
+      console.log('update data', this.data)
+    }, 10000)
   }
 
 }

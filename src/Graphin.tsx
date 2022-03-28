@@ -5,7 +5,7 @@ import { omit } from 'lodash'
 import G6, { Graph as IGraph, GraphData, GraphOptions, TreeGraphData } from '@antv/g6';
 // import React, { ErrorInfo } from 'react';
 /** 内置API */
-import GraphinType  from '@antv/graphin/es/Graphin';
+// import GraphinType  from '@antv/graphin/es/Graphin';
 import ApiController from '@antv/graphin/es/apis';
 import { ApisType } from '@antv/graphin/es/apis/types';
 /** 内置 Behaviors */
@@ -93,6 +93,8 @@ const Graphin = defineComponent({
     G6.registerLayout(layoutName, layout);
   },
 
+  name: "Graphin",
+
   props: {
     data: {
       type: Object,
@@ -113,6 +115,14 @@ const Graphin = defineComponent({
     layoutCache: {
       type: Boolean,
       default: () => false
+    },
+    modes: {
+      type: Object,
+      default: () => ({default: []})
+    },
+    graphStyle: {
+      type: Object,
+      default: () => ({})
     }
   },
 
@@ -204,6 +214,8 @@ const Graphin = defineComponent({
         ...otherOptions
       } = props;
 
+      console.log('initGraphInstance', props)
+
       if (modes.default.length > 0) {
         // TODO :给用户正确的引导，推荐使用Graphin的Behaviors组件
         console.info(
@@ -289,6 +301,7 @@ const Graphin = defineComponent({
 
       /** 装载数据 */
       graph.value.data(toRaw(data.value) as GraphData | TreeGraphData);
+      console.log('initGraphInstance render', data.value, graph.value)
 
       /** 初始化布局：仅限网图 */
       if (!isTree.value) {
@@ -372,9 +385,8 @@ const Graphin = defineComponent({
         <div
           data-testid="custom-element"
           class="graphin-core"
-          ref={(ref) => {
-            graphDOM.value = ref
-          }}
+          ref={ref => graphDOM.value = ref}
+          style={{ background: theme.value?.background, ...props.graphStyle }}
         />
         <div class="graphin-components">
           {/** @ts-ignore */}
@@ -405,7 +417,7 @@ const Graphin = defineComponent({
         </div>
       </div>
     )
-  },
+  }
 })
 
 export default Graphin
