@@ -24,7 +24,6 @@
 import type { ExtractPropTypes } from 'vue';
 import { defineComponent, onMounted, ref, provide, inject } from 'vue';
 
-import Graphin from './Graphin'
 import { Parent, Child } from './Demo'
 
 import { Options, Vue as Component } from 'vue-class-component';
@@ -44,7 +43,9 @@ import { GraphinData } from '@antv/graphin/es/typings/type';
 // import TreeCollapse from './behaviors/TreeCollapse'
 // import DragNodeWithForce from './behaviors/DragNodeWithForce'
 
-import Behaviors from './behaviors'
+// import Graphin from './Graphin'
+// import Behaviors from './behaviors'
+import Graphin, { Behaviors } from '../dist/index.es'
 const {
   /** 内置 */
   DragCanvas,
@@ -105,7 +106,7 @@ export default class App extends Component {
     }, 3000)
     setTimeout(() => {
       // @ts-ignore
-      this.data = Utils.mock(100).circle().graphin()
+      this.data = Utils.mock(300).circle().graphin()
       console.log('update data', this.data)
     }, 10000)
   }

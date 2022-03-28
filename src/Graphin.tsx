@@ -370,17 +370,18 @@ const Graphin = defineComponent({
   },
   render() {
     const { themeRef, graphStyle, isReady, modes, graphDOM } = this;
+    console.log('render', this.$slots.default, isReady.value)
     return (
       <div id="graphin-container">
         <div
           data-testid="custom-element"
           class="graphin-core"
           ref="graphDOM"
-          style={{ background: themeRef.value ? themeRef.value.background : undefined, ...graphStyle }}
+          style={{ background: themeRef ? themeRef.background : undefined, ...graphStyle }}
         />
         <div class="graphin-components">
           {/** @ts-ignore */}
-          {isReady.value && <>
+          {isReady && <div>
             {
               /** @ts-ignore modes 不存在的时候，才启动默认的behaviors，否则会覆盖用户自己传入的 */
               !modes && (
@@ -402,8 +403,8 @@ const Graphin = defineComponent({
             }
             {this.$slots.default ? this.$slots.default() : null}
             {/** resize 画布 */}
-            <ResizeCanvas graphDOM={graphDOM.value as HTMLDivElement} />
-          </>}
+            <ResizeCanvas graphDOM={graphDOM as HTMLDivElement} />
+          </div>}
         </div>
       </div>
     )
