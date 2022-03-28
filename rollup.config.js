@@ -5,7 +5,7 @@ import jsx from "acorn-jsx";
 import less from 'rollup-plugin-less';
 import pkg from './package.json'
 import buble from 'rollup-plugin-buble'
-import nodeResolve from 'rollup-plugin-node-resolve'
+// import nodeResolve from 'rollup-plugin-node-resolve'
 import optimizeLodashImports from "rollup-plugin-optimize-lodash-imports"
 
 
@@ -23,11 +23,11 @@ export default {
     less({
       output: 'dist/index.css'
     }),
-    nodeResolve({
-      jsnext: true,
-      main: true,
-      browser: true
-    }),
+    // nodeResolve({
+    //   jsnext: true,
+    //   main: true,
+    //   browser: true
+    // }),
     babel({
       // extensions: ['.ts', '.js', '.tsx'],
       // babelHelpers: "bundled",
