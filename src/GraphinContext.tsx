@@ -12,7 +12,7 @@ export const useContext = () => {
   if (!context) {
     throw new Error('context must be used after useProvide')
   }
-  return context
+  return context.value ? context.value : context
 }
 
 // export default defineComponent({

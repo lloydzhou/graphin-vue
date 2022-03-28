@@ -3,11 +3,11 @@
   <Parent>
     <Child />
   </Parent>
-  <Graphin :data="data">
+  <Graphin :data="data" :layout="layout">
     <ActivateRelations trigger="mouseenter" />
     <BrushSelect />
     <ClickSelect />
-    <FitView />
+    <!-- <FitView /> -->
     <FontPaint />
     <ZoomCanvas />
     <DragCanvas />
@@ -16,10 +16,11 @@
     <Hoverable />
     <LassoSelect />
     <!-- <TreeCollapse /> -->
-    <DragNodeWithForce />
+    <!-- <DragNodeWithForce /> -->
   </Graphin>
 </template>
 <script lang="ts">
+// @ts-nocheck
 import type { ExtractPropTypes } from 'vue';
 import { defineComponent, onMounted, ref, provide, inject } from 'vue';
 
@@ -87,15 +88,19 @@ const {
 export default class App extends Component {
 
   name = 'world'
+  data = {nodes: [], edeges: []}
+  layout = {
+    type: 'force'
+  }
 
   created() {
     setTimeout(() => this.name = 'lloyd', 2000)
     console.log('created', this)
     // @ts-ignore
-    this.data = Utils.mock(20).circle().graphin()
+    this.data = Utils.mock(5).circle().graphin()
     setTimeout(() => {
       // @ts-ignore
-      this.data = Utils.mock(20).circle().graphin()
+      this.data = Utils.mock(10).circle().graphin()
       console.log('update data', this.data)
     }, 3000)
   }

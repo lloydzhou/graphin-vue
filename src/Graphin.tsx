@@ -1,4 +1,6 @@
-import { defineComponent, onMounted, onUnmounted, ref, provide, inject, reactive, nextTick, toRef, toRefs, ExtractPropTypes, PropType, CSSProperties, shallowReactive, watchEffect } from 'vue';
+// @ts-nocheck
+import { defineComponent, onMounted, onUnmounted, ref, provide, inject, reactive, nextTick, toRef, toRefs, ExtractPropTypes, PropType, CSSProperties, shallowReactive, watchEffect, watch, toRaw, shallowRef, computed } from 'vue';
+import { omit } from 'lodash'
 
 import G6, { Graph as IGraph, GraphData, GraphOptions, TreeGraphData } from '@antv/g6';
 // import React, { ErrorInfo } from 'react';
@@ -117,53 +119,79 @@ const Graphin = defineComponent({
   components: { ResizeCanvas },
 
   setup(props, { slots }) {
-    // @ts-ignore
-    const { data, layout, width, height, layoutCache, ...otherOptions } = props as GraphinProps;
-    
+    const isReady = shallowRef(false);
 
-    const self = reactive({
-      data,
-      isTree: Boolean(data && (data as GraphinTreeData).children) || TREE_LAYOUTS.indexOf(String(layout && layout.type)) !== -1,
-      graph: {} as IGraph,
-      height: Number(height),
-      width: Number(width),
-      theme: {} as ThemeData,
-      apis: {} as ApisType,
-      layoutCache,
-      layout: {} as LayoutController,
-      dragNodes: [] as IUserNode[],
-      options: { ...otherOptions } as GraphOptions,
+    /** Graph的DOM */
+    const graphDOM = ref<HTMLDivElement | null>(null);
+    /** G6 instance */
+    const graph = shallowRef<IGraph>({} as IGraph);
+    /** layout */
+    const layout = shallowRef<LayoutController>({} as LayoutController);
 
-      isReady: false,
+    const layoutCache = shallowRef(props.layoutCache);
+    const width = ref(props.width);
+    const height = ref(props.height);
+    const animateRef = ref(props.animate);
 
-      graphDOM: {} as HTMLDivElement,
-      props: cloneDeep(props)
-    })
+    /** 是否为 Tree Graph */
+    const isTree = shallowRef(
+      Boolean(props.data && (props.data as GraphinTreeData).children) ||
+        TREE_LAYOUTS.indexOf(String(props.layout && props.layout.type)) !== -1,
+    );
 
-    // 这个变量用来处理provide的内容，避免self中变量过多导致watchEffect执行多次
-    const context = reactive({
-      graph: {} as IGraph,
-      apis: {} as ApisType,
-      theme: {} as ThemeData,
-      layout: {} as LayoutController,
-      dragNodes: [] as IUserNode[],
-    })
-    createContext(context)
+    /** G6实例中的 nodes,edges,combos 的 model，会比props.data中多一些引用赋值产生的属性，比如node中的 x,y */
+    const data = shallowRef<GraphinTreeData | GraphinData | undefined>(props.data);
 
-    const initData = (data: GraphinProps['data']) => {
-      if ((data as GraphinTreeData).children) {
-        self.isTree = true;
+    const options = shallowRef<GraphOptions>(
+      omit(props, ['data', 'layout', 'width', 'height', 'layoutCache']) as unknown as GraphOptions,
+    );
+
+    const apis = shallowRef<ApisType>({} as ApisType);
+    const theme = shallowRef<ThemeData>({} as ThemeData);
+
+    const contextRef = computed<GraphinContextType>(() => {
+      return {
+        apis: apis.value,
+        theme: theme.value,
+        graph: (graph.value || {}) as IGraph,
+        layout: layout as LayoutController,
+      };
+    });
+
+    createContext(contextRef);
+
+    const initData = (newData: GraphinProps['data']) => {
+      if ((newData as GraphinTreeData).children) {
+        isTree.value = true;
       }
-      self.data = cloneDeep(data);
+      data.value = { ...newData };
+    };
+
+    /** 初始化状态 */
+    const initStatus = () => {
+      if (!isTree.value) {
+        const { nodes = [], edges = [] } = props.data as GraphinData;
+        nodes.forEach((node) => {
+          const { status } = node;
+          if (status) {
+            Object.keys(status).forEach((k) => {
+              graph.value.setItemState(node.id, k, Boolean(status[k]));
+            });
+          }
+        });
+        edges.forEach((edge) => {
+          const { status } = edge;
+          if (status) {
+            Object.keys(status).forEach((k) => {
+              graph.value.setItemState(edge.id, k, Boolean(status[k]));
+            });
+          }
+        });
+      }
     };
 
     const initGraphInstance = () => {
       const {
-        theme,
-        data,
-        layout,
-        width,
-        height,
         defaultCombo = { style: {}, type: 'graphin-combo' },
         defaultEdge = { style: {}, type: 'graphin-line' },
         defaultNode = { style: {}, type: 'graphin-circle' },
@@ -174,22 +202,26 @@ const Graphin = defineComponent({
         animate,
         handleAfterLayout,
         ...otherOptions
-        // @ts-ignore
-      } = props as GraphinProps;
+      } = props;
+
       if (modes.default.length > 0) {
         // TODO :给用户正确的引导，推荐使用Graphin的Behaviors组件
-        console.info('%c suggestion: you can use @antv/graphin Behaviors components', 'color:lightgreen');
+        console.info(
+          '%c suggestion: you can use @antv/graphin Behaviors components',
+          'color:lightgreen',
+        );
       }
+
       /**  width and height */
-      const { clientWidth, clientHeight } = self.graphDOM as HTMLDivElement;
+      const { clientWidth, clientHeight } = graphDOM.value as HTMLDivElement;
       /** shallow clone */
-      initData(data);
+      initData(props.data);
 
       /** 重新计算宽度 */
-      self.width = Number(width) || clientWidth || 500;
-      self.height = Number(height) || clientHeight || 500;
+      width.value = Number(props.width) || clientWidth || 500;
+      height.value = Number(props.height) || clientHeight || 500;
 
-      const themeResult = getDefaultStyleByTheme(theme);
+      const themeResult = getDefaultStyleByTheme(props.theme);
 
       const {
         defaultNodeStyle,
@@ -202,281 +234,138 @@ const Graphin = defineComponent({
       } = themeResult;
 
       /** graph type */
-      self.isTree =
-        Boolean((data as GraphinTreeData).children) || TREE_LAYOUTS.indexOf(String(layout && layout.type)) !== -1;
+      isTree.value =
+        Boolean((props.data as GraphinTreeData).children) ||
+        TREE_LAYOUTS.indexOf(String(props.layout && props.layout.type)) !== -1;
 
       const finalStyle = {
-        defaultNode: { style: { ...defaultNode.style, _theme: theme }, type: defaultNode.type || 'graphin-circle' }, // isGraphinNodeType ? deepMix({}, defaultNodeStyle, defaultNode) : defaultNode,
-        defaultEdge: { style: { ...defaultEdge.style, _theme: theme }, type: defaultEdge.type || 'graphin-line' }, // isGraphinEdgeType ? deepMix({}, defaultEdgeStyle, defaultEdge) : defaultEdge,
-        defaultCombo: { style: { ...defaultCombo.style, _theme: theme }, type: defaultCombo.type || 'combo' }, // deepMix({}, defaultComboStyle, defaultCombo), // TODO:COMBO的样式需要内部自定义
+        defaultNode: {
+          style: { ...defaultNode.style, _theme: theme.value },
+          type: defaultNode.type || 'graphin-circle',
+        }, // isGraphinNodeType ? deepMix({}, defaultNodeStyle, defaultNode) : defaultNode,
+        defaultEdge: {
+          style: { ...defaultEdge.style, _theme: theme.value },
+          type: defaultEdge.type || 'graphin-line',
+        }, // isGraphinEdgeType ? deepMix({}, defaultEdgeStyle, defaultEdge) : defaultEdge,
+        defaultCombo: {
+          style: { ...defaultCombo.style, _theme: theme.value },
+          type: defaultCombo.type || 'combo',
+        },
+        // deepMix({}, defaultComboStyle, defaultCombo), // TODO:COMBO的样式需要内部自定义
         /** status 样式 */
-        nodeStateStyles, // isGraphinNodeType ? deepMix({}, defaultNodeStatusStyle, nodeStateStyles) : nodeStateStyles,
-        edgeStateStyles, // isGraphinEdgeType ? deepMix({}, defaultEdgeStatusStyle, edgeStateStyles) : edgeStateStyles,
+        nodeStateStyles, // isGraphinNodeType ? deepMix({}, defaultNodeStatusStyle, nodeStateStyles) : nodeStateSty    les,
+        edgeStateStyles, // isGraphinEdgeType ? deepMix({}, defaultEdgeStatusStyle, edgeStateStyles) : edgeStateSty    les,
         comboStateStyles, // deepMix({}, defaultComboStatusStyle, comboStateStyles),
       };
-      // @ts-ignore
-      self.theme = { ...finalStyle, ...otherTheme } as ThemeData;
 
-      self.options = {
-        container: self.graphDOM,
+      theme.value = { ...finalStyle, ...otherTheme } as unknown as ThemeData;
+      options.value = {
+        container: graphDOM.value,
         renderer: 'canvas',
-        width: self.width,
-        height: self.height,
+        width: width.value,
+        height: height.value,
         animate: animate !== false,
         ...finalStyle,
         modes,
         ...otherOptions,
       } as GraphOptions;
 
-      if (self.isTree) {
-        self.options.layout = layout || DEFAULT_TREE_LATOUT_OPTIONS;
-        // @ts-ignore
-        self.graph = new G6.TreeGraph(self.options);
+      if (isTree.value) {
+        options.value = {
+          ...options.value,
+          layout: props.layout || DEFAULT_TREE_LATOUT_OPTIONS,
+        };
+        graph.value = new G6.TreeGraph(toRaw(options.value) as GraphOptions);
       } else {
-        // @ts-ignore
-        self.graph = new G6.Graph(self.options);
+        graph.value = new G6.Graph(toRaw(options.value) as GraphOptions);
       }
 
       /** 内置事件:AfterLayout 回调 */
-      self.graph.on('afterlayout', () => {
+      graph.value.on('afterlayout', () => {
         if (handleAfterLayout) {
-          handleAfterLayout(self.graph as IGraph);
+          handleAfterLayout(toRaw(graph.value) as IGraph);
         }
       });
 
       /** 装载数据 */
-      self.graph.data(self.data as GraphData | TreeGraphData);
-
-      /** 渲染 */
-      self.graph.render();
+      graph.value.data(toRaw(data.value) as GraphData | TreeGraphData);
 
       /** 初始化布局：仅限网图 */
-      if (!self.isTree) {
-        // @ts-ignore
-        self.layout = new LayoutController(self as typeof Graphin);
-        self.layout.start();
+      if (!isTree.value) {
+        layout.value = new LayoutController({
+          context: contextRef.value,
+          props,
+          width: width.value,
+          height: height.value,
+          graphDOM: graphDOM.value,
+          data: toRaw(data.value),
+          graph: graph.value,
+          options: options,
+        });
+
+        layout.value.start();
       }
 
-      // self.graph.get('canvas').set('localRefresh', true);
-
+      /** 渲染 */
+      graph.value.render();
       /** FitView 变为组件可选 */
 
       /** 初始化状态 */
       initStatus();
       /** 生成API */
-      self.apis = ApiController(self.graph as IGraph);
-      self.isReady = true
-      context.graph = self.graph
-      context.apis = self.apis
-      context.theme = self.theme
-      context.layout = self.layout
-      context.dragNodes = self.dragNodes
-      /** 设置Context */
-      // 使用
-      // this.setState({
-      //   isReady: true,
-      //   context: {
-      //     graph: this.graph,
-      //     apis: this.apis,
-      //     theme: this.theme,
-      //     layout: this.layout,
-      //     dragNodes: this.dragNodes,
-      //     updateContext: this.updateContext,
-      //   },
-      // });
+      apis.value = ApiController(toRaw(graph.value) as IGraph);
+
+      isReady.value = true;
     };
-
-
-    const updateLayout = () => {
-      self.layout.changeLayout();
-    };
-
-    /**
-     * 组件更新的时候
-     * @param prevProps
-     */
-    const updateOptions = () => {
-      const { ...options } = props;
-      return options;
-    };
-
-    /** 初始化状态 */
-    const initStatus = () => {
-      if (!self.isTree) {
-        // @ts-ignore
-        const { data } = props as GraphinProps;
-        const { nodes = [], edges = [] } = data as GraphinData;
-        nodes.forEach(node => {
-          const { status } = node;
-          if (status) {
-            Object.keys(status).forEach(k => {
-              self.graph.setItemState(node.id, k, Boolean(status[k]));
-            });
-          }
-        });
-        edges.forEach(edge => {
-          const { status } = edge;
-          if (status) {
-            Object.keys(status).forEach(k => {
-              self.graph.setItemState(edge.id, k, Boolean(status[k]));
-            });
-          }
-        });
-      }
-    };
-
-    const updateContext = (config: PlainObject) => {
-      // this.setState(prevState => ({
-      //   context: {
-      //     ...prevState.context,
-      //     ...config,
-      //   },
-      // }));
-    };
-
-    const clear = () => {
-      if (self.layout && self.layout.destroy) {
-        self.layout.destroy(); // tree graph
-      }
-      self.layout = {} as LayoutController;
-      self.graph!.clear();
-      self.data = { nodes: [], edges: [], combos: [] };
-      self.graph!.destroy();
-    };
-
-    const shouldUpdate = (prevProps: GraphinProps, key: string) => {
-      const prevVal = prevProps[key];
-      const currentVal = self.props[key] as DiffValue;
-      const isEqual = deepEqual(prevVal, currentVal);
-      return !isEqual;
-    }
 
     onMounted(() => {
-      nextTick(() => initGraphInstance())
-      watchEffect((onInvalidate) => {
-        const isDataChange = shouldUpdate(self.props, 'data');
-        const isLayoutChange = shouldUpdate(self.props, 'layout');
-        const isOptionsChange = shouldUpdate(self.props, 'options');
-        const isThemeChange = shouldUpdate(self.props, 'theme');
-        // console.timeEnd('did-update');
-        const { data, layoutCache, layout } = props;
-        self.layoutCache = layoutCache;
-        // const isGraphTypeChange = (prevProps.data as GraphinTreeData).children !== (data as GraphinTreeData).children;
+      initGraphInstance();
+    });
 
-        if (isThemeChange) {
-          // TODO :Node/Edge/Combo 批量调用 updateItem 来改变
-        }
-
-        /** 图类型变化 */
-        // if (isGraphTypeChange) {
-        //   console.error(
-        //     'The data types of pervProps.data and props.data are inconsistent,Graphin does not support the dynamic switching of TreeGraph and NetworkGraph',
-        //   );
-        //   return;
-        // }
-
-        /** 配置变化 */
-        if (isOptionsChange) {
-          // this.updateOptions();
-        }
-
-        /** 数据变化 */
-        if (isDataChange) {
-          initData(data as GraphinProps["data"]);
-
-          if (self.isTree) {
-            // this.graph.data(this.data as TreeGraphData);
-            self.graph.changeData(self.data as TreeGraphData);
-          } else {
-            const { dragNodes } = context
-            // 更新拖拽后的节点的mass到data
-            // @ts-ignore
-            self.data?.nodes?.forEach(node => {
-              const dragNode = dragNodes.find(item => item.id === node.id);
-              if (dragNode) {
-                node.layout = {
-                  ...node.layout,
-                  force: {
-                    mass: dragNode.layout?.force?.mass,
-                  },
-                };
-              }
-            });
-
-            self.graph.data(self.data as GraphData | TreeGraphData);
-            self.graph.set('layoutController', null);
-            self.graph.changeData(self.data as GraphData | TreeGraphData);
-
-            // 由于 changeData 是将 this.data 融合到 item models 上面，因此 changeData 后 models 与 this.data 不是同一个引用了
-            // 执行下面一行以保证 graph item model 中的数据与 this.data 是同一份
-            // @ts-ignore
-            self.data = self.layout.getDataFromGraph();
-            self.layout.changeLayout();
-          }
-
+    // dataChange
+    watch(
+      () => props.data,
+      (v) => {
+        console.log('dataChange')
+        if (!deepEqual(toRaw(v), toRaw(data.value))) {
+          initData(v);
+          graph.value.data(toRaw(data.value) as GraphData | TreeGraphData);
+          graph.value.changeData(toRaw(data.value) as GraphData | TreeGraphData);
+          layout.value.changeLayout();
           initStatus();
-          self.apis = ApiController(self.graph as IGraph);
-          // 模拟setState
-          context.graph = self.graph
-          context.apis = self.apis
-          context.theme = self.theme
-          context.layout = self.layout
-          context.dragNodes = self.dragNodes
-          // console.log('%c isDataChange', 'color:grey');
-          // this.setState(
-          //   preState => {
-          //     return {
-          //       ...preState,
-          //       context: {
-          //         graph: this.graph,
-          //         apis: this.apis,
-          //         theme: this.theme,
-          //         layout: this.layout,
-          //         dragNodes: preState.context.dragNodes,
-          //         updateContext: this.updateContext,
-          //       },
-          //     };
-          //   },
-          //   () => {
-          //     this.graph.emit('graphin:datachange');
-          //     if (isLayoutChange) {
-          //       this.graph.emit('graphin:layoutchange', { prevLayout: prevProps.layout, layout });
-          //     }
-          //   },
-          // );
-          // return;
+          apis.value = ApiController(toRaw(graph.value) as IGraph);
+          graph.value.emit('graphin:datachange');
         }
-        /** 布局变化 */
-        if (isLayoutChange) {
-          if (self.isTree) {
-            // @ts-ignore
-            self.graph.updateLayout(props.layout);
-            return;
-          }
-          /**
-           * TODO
-           * 1. preset 前置布局判断问题
-           * 2. enablework 问题
-           * 3. G6 LayoutController 里的逻辑
-           */
-          /** 数据需要从画布中来 */
-          // @ts-ignore
-          self.data = self.layout.getDataFromGraph();
-          self.layout.changeLayout();
-          self.layout.refreshPosition();
+      },
+    );
+    // layout 更新
+    watch(
+      () => props.layout,
+      () => {
+        layout.value.changeLayout();
+      },
+    );
 
-          /** 走G6的layoutController */
-          // this.graph.updateLayout();
-          // console.log('%c isLayoutChange', 'color:grey');
-          self.graph.emit('graphin:layoutchange', { prevLayout: self.props.layout, layout });
-        }
-        onInvalidate(() => {
-          clear()
-        })
-      })
-    })
-    // onUnmounted(() => clear())
+    watch(
+      () => props.layoutCache,
+      (v) => {
+        layoutCache.value = v;
+      },
+    );
 
+    const clear = () => {
+      if (layout.value && layout.value.destroy) {
+        layout.value.destroy(); // tree graph
+      }
+      layout.value = {} as LayoutController;
+      graph.value!.clear();
+      data.value = { nodes: [], edges: [], combos: [] };
+      graph.value!.destroy();
+    };
+
+    onUnmounted(() => {
+      clear();
+    });
 
     return () => (
       <div id="graphin-container">
@@ -484,13 +373,12 @@ const Graphin = defineComponent({
           data-testid="custom-element"
           class="graphin-core"
           ref={(ref) => {
-            // @ts-ignore
-            self.graphDOM = ref
+            graphDOM.value = ref
           }}
         />
         <div class="graphin-components">
           {/** @ts-ignore */}
-          {self.isReady && <>
+          {isReady.value && <>
             {
               /** @ts-ignore modes 不存在的时候，才启动默认的behaviors，否则会覆盖用户自己传入的 */
               !props.modes && (
@@ -512,191 +400,12 @@ const Graphin = defineComponent({
             }
             {slots.default ? slots.default() : null}
             {/** resize 画布 */}
-            <ResizeCanvas graphDOM={self.graphDOM as HTMLDivElement} />
+            <ResizeCanvas graphDOM={graphDOM.value as HTMLDivElement} />
           </>}
         </div>
       </div>
     )
   },
-
-  // componentDidUpdate(prevProps: GraphinProps) {
-  //   // console.time('did-update');
-  //   const isDataChange = this.shouldUpdate(prevProps, 'data');
-  //   const isLayoutChange = this.shouldUpdate(prevProps, 'layout');
-  //   const isOptionsChange = this.shouldUpdate(prevProps, 'options');
-  //   const isThemeChange = this.shouldUpdate(prevProps, 'theme');
-  //   // console.timeEnd('did-update');
-  //   const { data, layoutCache, layout } = this.$attrs;
-  //   this.layoutCache = layoutCache;
-  //   // const isGraphTypeChange = (prevProps.data as GraphinTreeData).children !== (data as GraphinTreeData).children;
-
-  //   if (isThemeChange) {
-  //     // TODO :Node/Edge/Combo 批量调用 updateItem 来改变
-  //   }
-
-  //   /** 图类型变化 */
-  //   // if (isGraphTypeChange) {
-  //   //   console.error(
-  //   //     'The data types of pervProps.data and props.data are inconsistent,Graphin does not support the dynamic switching of TreeGraph and NetworkGraph',
-  //   //   );
-  //   //   return;
-  //   // }
-
-  //   /** 配置变化 */
-  //   if (isOptionsChange) {
-  //     // this.updateOptions();
-  //   }
-
-  //   /** 数据变化 */
-  //   if (isDataChange) {
-  //     this.initData(data);
-
-  //     if (this.isTree) {
-  //       // this.graph.data(this.data as TreeGraphData);
-  //       this.graph.changeData(this.data as TreeGraphData);
-  //     } else {
-  //       const {
-  //         context: { dragNodes },
-  //       } = this.state;
-  //       // 更新拖拽后的节点的mass到data
-  //       // @ts-ignore
-  //       this.data?.nodes?.forEach(node => {
-  //         const dragNode = dragNodes.find(item => item.id === node.id);
-  //         if (dragNode) {
-  //           node.layout = {
-  //             ...node.layout,
-  //             force: {
-  //               mass: dragNode.layout?.force?.mass,
-  //             },
-  //           };
-  //         }
-  //       });
-
-  //       this.graph.data(this.data as GraphData | TreeGraphData);
-  //       this.graph.set('layoutController', null);
-  //       this.graph.changeData(this.data as GraphData | TreeGraphData);
-
-  //       // 由于 changeData 是将 this.data 融合到 item models 上面，因此 changeData 后 models 与 this.data 不是同一个引用了
-  //       // 执行下面一行以保证 graph item model 中的数据与 this.data 是同一份
-  //       // @ts-ignore
-  //       this.data = this.layout.getDataFromGraph();
-  //       this.layout.changeLayout();
-  //     }
-
-  //     this.initStatus();
-  //     this.apis = ApiController(this.graph);
-  //     // console.log('%c isDataChange', 'color:grey');
-  //     // this.setState(
-  //     //   preState => {
-  //     //     return {
-  //     //       ...preState,
-  //     //       context: {
-  //     //         graph: this.graph,
-  //     //         apis: this.apis,
-  //     //         theme: this.theme,
-  //     //         layout: this.layout,
-  //     //         dragNodes: preState.context.dragNodes,
-  //     //         updateContext: this.updateContext,
-  //     //       },
-  //     //     };
-  //     //   },
-  //     //   () => {
-  //     //     this.graph.emit('graphin:datachange');
-  //     //     if (isLayoutChange) {
-  //     //       this.graph.emit('graphin:layoutchange', { prevLayout: prevProps.layout, layout });
-  //     //     }
-  //     //   },
-  //     // );
-  //     return;
-  //   }
-  //   /** 布局变化 */
-  //   if (isLayoutChange) {
-  //     if (this.isTree) {
-  //       // @ts-ignore
-  //       // eslint-disable-next-line react/destructuring-assignment
-  //       this.graph.updateLayout(this.$attrs.layout);
-  //       return;
-  //     }
-  //     /**
-  //      * TODO
-  //      * 1. preset 前置布局判断问题
-  //      * 2. enablework 问题
-  //      * 3. G6 LayoutController 里的逻辑
-  //      */
-  //     /** 数据需要从画布中来 */
-  //     // @ts-ignore
-  //     this.data = this.layout.getDataFromGraph();
-  //     this.layout.changeLayout();
-  //     this.layout.refreshPosition();
-
-  //     /** 走G6的layoutController */
-  //     // this.graph.updateLayout();
-  //     // console.log('%c isLayoutChange', 'color:grey');
-  //     this.graph.emit('graphin:layoutchange', { prevLayout: prevProps.layout, layout });
-  //   }
-  // }
-
-  // /**
-  //  * 组件移除的时候
-  //  */
-  // componentWillUnmount() {
-  //   this.clear();
-  // }
-
-  // /**
-  //  * 组件崩溃的时候
-  //  * @param error
-  //  * @param info
-  //  */
-  // componentDidCatch(error: Error, info: ErrorInfo) {
-  //   console.error('Catch component error: ', error, info);
-  // }
-
-    // return (
-    //   <GraphinContext.Provider value={this.state.context}>
-    //     <div id="graphin-container">
-    //       <div
-    //         data-testid="custom-element"
-    //         className="graphin-core"
-    //         ref={node => {
-    //           this.graphDOM = node;
-    //         }}
-    //         style={{ background: this.theme?.background, ...style }}
-    //       />
-    //       <div className="graphin-components">
-    //         {isReady && (
-    //           <>
-    //             {
-    //               /** modes 不存在的时候，才启动默认的behaviors，否则会覆盖用户自己传入的 */
-    //               !modes && (
-    //                 <>
-    //                   {/* 拖拽画布 */}
-    //                   <DragCanvas />
-    //                   {/* 缩放画布 */}
-    //                   <ZoomCanvas />
-    //                   {/* 拖拽节点 */}
-    //                   <DragNode />
-    //                   {/* 点击节点 */}
-    //                   <DragCombo />
-    //                   {/* 点击节点 */}
-    //                   <ClickSelect />
-    //                   {/* 圈选节点 */}
-    //                   <BrushSelect />
-    //                 </>
-    //               )
-    //             }
-    //             {/** resize 画布 */}
-    //             <ResizeCanvas graphDOM={this.graphDOM as HTMLDivElement} />
-    //             {/* <Hoverable bindType="edge" /> */}
-    //             {this.props.children}
-    //             {/* <Hoverable bindType="node" /> 2.3.3 版本移除 */}
-    //           </>
-    //         )}
-    //       </div>
-    //     </div>
-    //   </GraphinContext.Provider>
-    // );
-  // }
 })
 
 export default Graphin
