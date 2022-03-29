@@ -15,7 +15,7 @@ yarn install
 
 使用的时候还需要依赖这个更改过的@antv/graphin库
 ```
-yarn add @antv/graphin@https://gitpkg.now.sh/lloydzhou/Graphin/blob/master/packages/graphin\?f2123cc07fc8834be2d34692951cdaa6139a0fa1
+yarn add @antv/graphin@https://gitpkg.now.sh/lloydzhou/Graphin/packages/graphin\?f2123cc07fc8834be2d34692951cdaa6139a0fa1
 ```
 ### Example
 

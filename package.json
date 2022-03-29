@@ -21,7 +21,7 @@
     "vue-class-component": "^8.0.0-rc.1"
   },
   "dependencies": {
-    "@antv/graphin": "https://gitpkg.now.sh/lloydzhou/Graphin/blob/master/packages/graphin?f2123cc07fc8834be2d34692951cdaa6139a0fa1"
+    "@antv/graphin": "https://gitpkg.now.sh/lloydzhou/Graphin/packages/graphin?f2123cc07fc8834be2d34692951cdaa6139a0fa1"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^4.18.0",
