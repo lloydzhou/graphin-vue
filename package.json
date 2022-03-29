@@ -18,9 +18,6 @@
     "vue": "^3.2.31",
     "vue-class-component": "^8.0.0-rc.1"
   },
-  "dependencies": {
-    "@antv/graphin": "https://github.com/lloydzhou/Graphin.git#171bb92d4c1d0b6fd5e434f2c735f5469d915346"
-  },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^4.18.0",
     "@typescript-eslint/parser": "^4.18.0",
@@ -84,5 +81,8 @@
       "vue-cli-service lint",
       "git add"
     ]
+  },
+  "dependencies": {
+    "@antv/graphin": "file:../Graphin/packages/graphin/"
   }
 }
