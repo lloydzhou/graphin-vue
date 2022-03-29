@@ -24,6 +24,11 @@
     "@antv/graphin": "https://gitpkg.now.sh/lloydzhou/Graphin/packages/graphin?f3784ee48e570111f0578edf1f0edff276b3e5e9"
   },
   "devDependencies": {
+    "@antv/g6": "^4.3.4",
+    "core-js": "^3.6.5",
+    "lodash": "^4.17.21",
+    "vue": "^3.2.31",
+    "vue-class-component": "^8.0.0-rc.1",
     "@typescript-eslint/eslint-plugin": "^4.18.0",
     "@typescript-eslint/parser": "^4.18.0",
     "@vue/babel-plugin-jsx": "^1.1.1",

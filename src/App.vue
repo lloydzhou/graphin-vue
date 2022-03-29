@@ -45,7 +45,8 @@ import { GraphinData } from '@antv/graphin/es/typings/type';
 
 // import Graphin from './Graphin'
 // import Behaviors from './behaviors'
-import Graphin, { Behaviors } from '../dist/index.es'
+// import Graphin, { Behaviors } from '../dist/index.es'
+import Graphin, { Behaviors } from './graphin'
 const {
   /** 内置 */
   DragCanvas,
