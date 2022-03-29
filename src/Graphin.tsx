@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { defineComponent, onMounted, onUnmounted, ref, provide, inject, reactive, nextTick, toRef, toRefs, ExtractPropTypes, PropType, CSSProperties, shallowReactive, watchEffect, watch, toRaw, shallowRef, computed } from 'vue';
+import { defineComponent, onMounted, onUnmounted, ref, watch, toRaw, shallowRef, computed } from 'vue';
 
 import G6, { Graph as IGraph, GraphData, GraphOptions, TreeGraphData } from '@antv/g6';
 // import React, { ErrorInfo } from 'react';
@@ -17,17 +17,16 @@ import './index.less';
 import LayoutController from '@antv/graphin/es/layout';
 import { getDefaultStyleByTheme, ThemeData } from '@antv/graphin/es/theme/index';
 /** types  */
-import { GraphinData, GraphinProps, GraphinTreeData, IconLoader, IUserNode, PlainObject } from '@antv/graphin/es/typings/type';
-import cloneDeep from '@antv/graphin/es/utils/cloneDeep';
+import { GraphinData, GraphinProps, GraphinTreeData, IconLoader } from '@antv/graphin/es/typings/type';
+// import cloneDeep from '@antv/graphin/es/utils/cloneDeep';
 /** utils */
 // import shallowEqual from './utils/shallowEqual';
 import deepEqual from '@antv/graphin/es/utils/deepEqual';
 
 const { DragCanvas, ZoomCanvas, DragNode, DragCombo, ClickSelect, BrushSelect, ResizeCanvas } = Behaviors;
 import {createContext} from './GraphinContext'
-// import { omit } from 'lodash'
-import omit from 'lodash/omit'
-// const omit = require('lodash/omit')
+import { omit } from 'lodash'
+
 
 const Graphin = defineComponent({
   registerNode (nodeName: string, options: { [key: string]: any }, extendedNodeName?: string) {

@@ -18,7 +18,7 @@ const DragNodeWithForce = defineComponent({
     } = useContext()
     const { autoPin } = props
     const handleNodeDragStart = () => {
-      const { instance } = layout
+      const { instance = {} } = layout
       const { simulation } = instance
       if (simulation) {
         simulation.stop()

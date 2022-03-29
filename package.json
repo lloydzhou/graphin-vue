@@ -1,13 +1,15 @@
 {
-  "name": "graphin-vue",
-  "version": "0.1.0",
-  "private": true,
+  "name": "antv-graphin-vue",
+  "version": "0.1.4",
+  "description": "the vue toolkit for graph analysis based on g6, based on @antv/graphin",
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint",
-    "lib": "vue-cli-service build --target lib --name index --dest lib src/graphin.ts",
-    "webcomponent": "vue-cli-service build --target wc --name index --dest webcomponent src/graphin.ts"
+    "build": "rollup -c",
+    "lint": "vue-cli-service lint"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lloydzhou/graphin-vue.git"
   },
   "main": "dist/index.tsx",
   "module": "dist/index.es.tsx",
@@ -17,6 +19,9 @@
     "lodash": "^4.17.21",
     "vue": "^3.2.31",
     "vue-class-component": "^8.0.0-rc.1"
+  },
+  "dependencies": {
+    "@antv/graphin": "https://gitpkg.now.sh/lloydzhou/Graphin/blob/master/packages/graphin?f2123cc07fc8834be2d34692951cdaa6139a0fa1"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^4.18.0",
@@ -39,8 +44,10 @@
     "less": "^4.1.2",
     "less-loader": "7.3.0",
     "lint-staged": "^9.5.0",
+    "rollup": "2.27.0",
     "rollup-plugin-babel": "^4.4.0",
     "rollup-plugin-buble": "^0.19.8",
+    "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-less": "^1.1.3",
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-optimize-lodash-imports": "^1.0.2",
@@ -48,6 +55,11 @@
     "rollup-plugin-typescript2": "^0.31.2",
     "rollup-plugin-vue": "^6.0.0",
     "typescript": "~4.1.5"
+  },
+  "author": "lloydzhou",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
   },
   "eslintConfig": {
     "root": true,
@@ -81,8 +93,5 @@
       "vue-cli-service lint",
       "git add"
     ]
-  },
-  "dependencies": {
-    "@antv/graphin": "file:../Graphin/packages/graphin/"
   }
 }
