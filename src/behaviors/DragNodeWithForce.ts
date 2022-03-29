@@ -25,6 +25,7 @@ const DragNodeWithForce = defineComponent({
       }
     }
     const handleNodeDragEnd = (e) => {
+      const { instance = {} } = layout
       const {
         simulation,
         type

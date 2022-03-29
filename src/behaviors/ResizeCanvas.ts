@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { watchEffect, defineComponent } from 'vue'
-import { useDebounceFn } from '@vueuse/core'
+import { debounce } from 'lodash'
 import { useContext, contextSymbol } from '../GraphinContext'
 
 const ResizeCanvas = defineComponent({
@@ -16,7 +16,7 @@ const ResizeCanvas = defineComponent({
     const { graphDOM } = props
     const { graph } = useContext()
     watchEffect((onInvalidate) => {
-      const handleResizeEvent = useDebounceFn(() => {
+      const handleResizeEvent = debounce(() => {
         const {
           clientWidth,
           clientHeight
