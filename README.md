@@ -21,7 +21,7 @@ yarn add @antv/graphin@https://gitpkg.now.sh/lloydzhou/Graphin/blob/master/packa
 
 ```
 import { defineComponent, reactive } from 'vue'
-import Graphin, { Utils, Behaviors } from ''
+import Graphin, { Utils, Behaviors } from 'antv-graphin-vue'
 const { DragCanvas, ZoomCanvas, DragNode, ResizeCanvas } = Behaviors
 
 const App = definecomponent({
