@@ -51,7 +51,7 @@ export const registerFontFamily = (iconLoader: IconLoader): Record<string, any> 
         console.error(`%c fontFamily:${fontFamily},does not found ${propKey} icon`);
         return '';
       }
-      return matchIcon?.unicode;
+      return matchIcon ? matchIcon.unicode : undefined;
     },
   });
 };
