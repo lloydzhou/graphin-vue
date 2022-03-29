@@ -15,6 +15,12 @@ export const useContext = () => {
   return context.value ? context.value : context
 }
 
+export default {
+  createContext,
+  contextSymbol,
+  useContext,
+}
+
 // export default defineComponent({
 //   name: 'Provide',
 //   props: {

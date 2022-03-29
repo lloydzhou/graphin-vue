@@ -15,9 +15,11 @@ export default {
     name: 'graphin-vue',
     format: 'umd',
     file: pkg.main,
+    banner: '// @ts-nocheck\nimport {h} from "vue"\n',
   }, {
     format: 'es',
     file: pkg.module,
+    banner: '// @ts-nocheck\nimport {h} from "vue"\n',
   }],
   plugins: [
     less({

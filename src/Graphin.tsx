@@ -196,8 +196,6 @@ const Graphin = defineComponent({
         ...otherOptions
       } = props;
 
-      console.log('initGraphInstance', props)
-
       if (modes.default.length > 0) {
         // TODO :给用户正确的引导，推荐使用Graphin的Behaviors组件
         console.info(
@@ -283,7 +281,6 @@ const Graphin = defineComponent({
 
       /** 装载数据 */
       graph.value.data(toRaw(data.value) as GraphData | TreeGraphData);
-      console.log('initGraphInstance render', data.value, graph.value)
 
       /** 初始化布局：仅限网图 */
       if (!isTree.value) {
@@ -321,13 +318,16 @@ const Graphin = defineComponent({
     watch(
       () => props.data,
       (v) => {
-        console.log('dataChange')
+        console.log('watch dataChange')
         if (!deepEqual(toRaw(v), toRaw(data.value))) {
+          console.log('dataChange')
           initData(v);
           const newData = toRaw(data.value)
           graph.value.data(newData as GraphData | TreeGraphData);
+          // graph.value.set('layoutController', null);
           graph.value.changeData(newData as GraphData | TreeGraphData);
           layout.value.changeLayout();
+          data.value = layout.value.getDataFromGraph();
           initStatus();
           apis.value = ApiController(toRaw(graph.value) as IGraph);
           graph.value.emit('graphin:datachange');
@@ -370,7 +370,6 @@ const Graphin = defineComponent({
   },
   render() {
     const { themeRef, graphStyle, isReady, modes, graphDOM } = this;
-    console.log('render', this.$slots.default, isReady.value)
     return (
       <div id="graphin-container">
         <div
@@ -403,7 +402,7 @@ const Graphin = defineComponent({
             }
             {this.$slots.default ? this.$slots.default() : null}
             {/** resize 画布 */}
-            <ResizeCanvas graphDOM={graphDOM as HTMLDivElement} />
+            {graphDOM && <ResizeCanvas graphDOM={graphDOM as HTMLDivElement} />}
           </div>}
         </div>
       </div>

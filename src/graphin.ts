@@ -4,6 +4,7 @@ import Graphin from './Graphin'
 //utils 工具
 import Utils from "@antv/graphin/es/utils/index"
 import Behaviors from './behaviors';
+import GraphinContext  from './GraphinContext';
 
 import registerGraphinForce from '@antv/graphin/es/layout/inner/registerGraphinForce';
 import registerPresetLayout from '@antv/graphin/es/layout/inner/registerPresetLayout';
@@ -40,16 +41,13 @@ export {
   Graphin,
   Utils,
   Behaviors,
+  GraphinContext
   // registerNode,
   // registerEdge,
   // registerCombo,
   // registerBehavior,
   // registerFontFamily
 }
-export {
-  /** export G6 */
-  default as G6,
-} from "@antv/g6"
 
 export interface GraphEvent extends MouseEvent {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
