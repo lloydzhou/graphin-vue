@@ -76,5 +76,5 @@ yarn lint
 See [Configuration Reference](https://cli.vuejs.org/config/).
 
 ## 感谢
-前端UI组件代码有参考 https://www.npmjs.com/package/vue-graphin这个库里面的代码逻辑，感谢@hugoyang
+前端UI组件代码有参考[vue-graphin](https://www.npmjs.com/package/vue-graphin)这个库里面的代码逻辑，感谢@hugoyang
 
