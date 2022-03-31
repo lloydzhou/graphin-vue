@@ -14,6 +14,7 @@ yarn install
 ```
 
 使用的时候还需要依赖这个更改过的@antv/graphin库
+> @antv/graphin库中移除react依赖的pr已经合并，等待新版本发布之后就不再使用这个自定义的版本，到时候会更新package.json使用新版本
 ```
 yarn add @antv/graphin@https://gitpkg.now.sh/lloydzhou/Graphin/packages/graphin\?4f4fdee5
 ```
