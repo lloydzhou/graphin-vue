@@ -118,6 +118,7 @@ const Graphin = defineComponent({
     const graph = shallowRef<IGraph>({} as IGraph);
     /** layout */
     const layout = shallowRef<LayoutController>({} as LayoutController);
+    const layoutContext = shallowRef({});
 
     const layoutCache = shallowRef(props.layoutCache);
     const width = ref(props.width);
@@ -283,7 +284,7 @@ const Graphin = defineComponent({
 
       /** 初始化布局：仅限网图 */
       if (!isTree.value) {
-        layout.value = new LayoutController({
+        layoutContext.value = {
           context: contextRef.value,
           props,
           width: width.value,
@@ -292,7 +293,8 @@ const Graphin = defineComponent({
           data: toRaw(data.value),
           graph: graph.value,
           options: options,
-        });
+        };
+        layout.value = new LayoutController(layoutContext.value);
 
         layout.value.start();
       }
@@ -321,12 +323,18 @@ const Graphin = defineComponent({
         if (!deepEqual(toRaw(v), toRaw(data.value))) {
           console.log('dataChange')
           initData(v);
+
           const newData = toRaw(data.value)
           graph.value.data(newData as GraphData | TreeGraphData);
-          // graph.value.set('layoutController', null);
+          graph.value.set('layoutController', null);
           graph.value.changeData(newData as GraphData | TreeGraphData);
+
+          // 由于 changeData 是将 this.data 融合到 item models 上面，因此 changeData 后 models 与 this.data 不是同一个引用了
+          // 执行下面一行以保证 graph item model 中的数据与 this.data 是同一份
+          // @ts-ignore
+          layoutContext.value.data = layout.value.getDataFromGraph();
           layout.value.changeLayout();
-          data.value = layout.value.getDataFromGraph();
+
           initStatus();
           apis.value = ApiController(toRaw(graph.value) as IGraph);
           graph.value.emit('graphin:datachange');
