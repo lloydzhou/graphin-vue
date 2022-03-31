@@ -1,13 +1,8 @@
 <template>
-  <h1>Hello {{name}}</h1>
-  <Parent>
-    <Child />
-  </Parent>
   <Graphin :data="data" :layout="layout">
     <ActivateRelations trigger="mouseenter" />
     <BrushSelect />
     <ClickSelect />
-    <!-- <FitView /> -->
     <FontPaint />
     <ZoomCanvas />
     <DragCanvas />
@@ -21,14 +16,8 @@
 </template>
 <script lang="ts">
 // @ts-nocheck
-import type { ExtractPropTypes } from 'vue';
-import { defineComponent, onMounted, ref, provide, inject } from 'vue';
-
-import { Parent, Child } from './Demo'
-
 import { Options, Vue as Component } from 'vue-class-component';
 import Utils from '@antv/graphin/es/utils'
-import { GraphinData } from '@antv/graphin/es/typings/type';
 // import ZoomCanvas from './behaviors/ZoomCanvas'
 // import FitView from './behaviors/FitView'
 // import FontPaint from './behaviors/FontPaint'
@@ -54,7 +43,7 @@ const {
   ClickSelect,
   BrushSelect,
   DragNode,
-  ResizeCanvas,
+  // ResizeCanvas,
   LassoSelect,
   DragCombo,
   Hoverable,
@@ -70,8 +59,6 @@ const {
 @Options({
   components: {
     Graphin,
-    Parent,
-    Child,
     ZoomCanvas,
     FitView,
     FontPaint,
@@ -92,7 +79,10 @@ export default class App extends Component {
   name = 'world'
   data = {nodes: [], edeges: []}
   layout = {
-    type: 'force'
+    type: 'graphin-force',
+    preset: {
+      type: 'grid',
+    }
   }
 
   created() {
@@ -107,7 +97,7 @@ export default class App extends Component {
     }, 3000)
     setTimeout(() => {
       // @ts-ignore
-      this.data = Utils.mock(300).circle().graphin()
+      this.data = Utils.mock(100).circle().graphin()
       console.log('update data', this.data)
     }, 10000)
   }
@@ -116,4 +106,8 @@ export default class App extends Component {
 </script>
 
 <style>
+#app{
+  width: 98vw;
+  height: 98vh;
+}
 </style>
