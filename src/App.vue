@@ -35,6 +35,7 @@ import Utils from '@antv/graphin/es/utils'
 // import Graphin from './Graphin'
 // import Behaviors from './behaviors'
 // import Graphin, { Behaviors } from '../dist/index.es'
+import { GraphinInstance } from './Graphin'
 import Graphin, { Behaviors } from './graphin'
 const {
   /** 内置 */
@@ -86,6 +87,11 @@ export default class App extends Component {
   }
 
   created() {
+
+    const instance = new GraphinInstance({})
+    console.log('instance', instance)
+    instance.name = 1
+
     setTimeout(() => this.name = 'lloyd', 2000)
     console.log('created', this)
     // @ts-ignore
@@ -95,11 +101,11 @@ export default class App extends Component {
       this.data = Utils.mock(10).circle().graphin()
       console.log('update data', this.data)
     }, 3000)
-    setTimeout(() => {
-      // @ts-ignore
-      this.data = Utils.mock(100).circle().graphin()
-      console.log('update data', this.data)
-    }, 10000)
+    // setTimeout(() => {
+    //   // @ts-ignore
+    //   this.data = Utils.mock(100).circle().graphin()
+    //   console.log('update data', this.data)
+    // }, 10000)
   }
 
 }

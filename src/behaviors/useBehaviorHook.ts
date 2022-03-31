@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { useContext, contextSymbol } from '../GraphinContext'
-import { watchEffect, defineComponent } from 'vue'
+import { watchEffect, defineComponent, onMounted, watch, onUnmounted } from 'vue'
 
 const useBehaviorHook = (params) => {
   return defineComponent({
@@ -21,9 +21,10 @@ const useBehaviorHook = (params) => {
       const { graph } = useContext()
       const { disabled } = props
       const { ...otherConfig } = context.attrs
-      watchEffect((onInvalidate) => {
-        /** 保持单例 */
-        graph!.removeBehaviors(type, mode)
+
+      onMounted(() => {
+        console.log('onMounted')
+        graph.removeBehaviors(type, mode);
         if (disabled) {
           return
         }
@@ -35,11 +36,11 @@ const useBehaviorHook = (params) => {
           type,
           ...config
         }, mode)
-        onInvalidate(() => {
-          if (!graph.destroyed) {
-            graph!.removeBehaviors(type, mode)
-          }
-        })
+      })
+      onUnmounted(() => {
+        if (!graph.destroyed) {
+          graph!.removeBehaviors(type, mode)
+        }
       })
       return () => null
     }
