@@ -29,50 +29,6 @@ import { omit } from 'lodash'
 
 
 const Graphin = defineComponent({
-  registerNode (nodeName: string, options: { [key: string]: any }, extendedNodeName?: string) {
-    G6.registerNode(nodeName, options, extendedNodeName);
-  },
-
-  registerEdge (edgeName: string, options: { [key: string]: any }, extendedEdgeName?: string) {
-    G6.registerEdge(edgeName, options, extendedEdgeName);
-  },
-
-  registerCombo (comboName: string, options: { [key: string]: any }, extendedComboName?: string) {
-    G6.registerEdge(comboName, options, extendedComboName);
-  },
-
-  registerBehavior(behaviorName: string, behavior: any) {
-    G6.registerBehavior(behaviorName, behavior);
-  },
-
-  registerFontFamily(iconLoader: IconLoader): { [icon: string]: any } {
-    /**  注册 font icon */
-    const iconFont = iconLoader();
-    const { glyphs, fontFamily } = iconFont;
-    const icons = glyphs.map(item => {
-      return {
-        name: item.name,
-        unicode: String.fromCodePoint(item.unicode_decimal),
-      };
-    });
-
-    return new Proxy(icons, {
-      get: (target, propKey: string) => {
-        const matchIcon = target.find(icon => {
-          return icon.name === propKey;
-        });
-        if (!matchIcon) {
-          console.error(`%c fontFamily:${fontFamily},does not found ${propKey} icon`);
-          return '';
-        }
-        return matchIcon ? matchIcon.unicode : null;
-      },
-    });
-  },
-
-  registerLayout(layoutName: string, layout: any) {
-    G6.registerLayout(layoutName, layout);
-  },
 
   name: "Graphin",
 
