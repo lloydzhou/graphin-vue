@@ -36,7 +36,7 @@ import Utils from '@antv/graphin/es/utils'
 // import Graphin from './Graphin'
 // import Behaviors from './behaviors'
 // import Graphin, { Behaviors } from '../dist/index.es'
-import Graphin, { Behaviors } from './graphin'
+import Graphin, { Behaviors } from './index'
 const {
   /** 内置 */
   DragCanvas,

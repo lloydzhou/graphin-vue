@@ -11,7 +11,7 @@ import buble from 'rollup-plugin-buble'
 
 
 export default {
-  input: 'src/graphin.ts',
+  input: 'src/index.ts',
   output: [{
     name: 'graphin-vue',
     format: 'umd',
