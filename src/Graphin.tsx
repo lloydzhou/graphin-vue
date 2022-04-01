@@ -83,14 +83,32 @@ const Graphin = defineComponent({
 
   setup(props, { slots }) {
 
-    const { data, layout, width, height, layoutCache, ...otherOptions } = props;
     /** 传递给LayoutController的对象 */
     const self = new GraphinInstance(props)
     /** Graph的DOM */
     const graphDOM = ref<HTMLDivElement | null>(null);
 
+    // 这里模拟处理@antv/Graphin组件的constructor逻辑
     // self.props不会同步变化
     watch(() => props, (newProps) => self.props = markRaw({...newProps}))
+    const { data, layout, width, height, layoutCache, ...otherOptions } = props;
+    self.data = data;
+    self.isTree =
+      Boolean(props.data && (props.data as GraphinTreeData).children) ||
+      TREE_LAYOUTS.indexOf(String(layout && layout.type)) !== -1;
+    self.graph = {} as IGraph;
+    self.height = Number(height);
+    self.width = Number(width);
+
+    self.theme = {} as ThemeData;
+    self.apis = {} as ApisType;
+    self.layoutCache = layoutCache;
+    self.layout = {} as LayoutController;
+    self.dragNodes = [] as IUserNode[];
+
+    self.options = { ...otherOptions } as GraphOptions;
+
+    self.isReady = false
 
     /** createContext内的数据 */
     const contextRef = shallowReactive({
@@ -258,7 +276,7 @@ const Graphin = defineComponent({
           initData(v);
 
           if (self.isTree) {
-            self.graph.changeData(this.data as TreeGraphData);
+            self.graph.changeData(self.data as TreeGraphData);
           } else {
             // 更新拖拽后的节点的mass到data
             // @ts-ignore
