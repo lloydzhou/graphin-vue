@@ -84,16 +84,13 @@ const Graphin = defineComponent({
   setup(props, { slots }) {
 
     const { data, layout, width, height, layoutCache, ...otherOptions } = props;
-    const self = new GraphinInstance(props)
-
-    console.log(self)
-
-    const isReady = shallowRef(false)
-
     /** 传递给LayoutController的对象 */
-    const layoutContext = shallowRef({});
+    const self = new GraphinInstance(props)
     /** Graph的DOM */
     const graphDOM = ref<HTMLDivElement | null>(null);
+
+    // self.props不会同步变化
+    watch(() => props, (newProps) => self.props = markRaw({...newProps}))
 
     /** createContext内的数据 */
     const contextRef = shallowReactive({
@@ -110,31 +107,7 @@ const Graphin = defineComponent({
       if ((newData as GraphinTreeData).children) {
         self.isTree = true;
       }
-      self.data = { ...newData };
-    };
-
-    /** 初始化状态 */
-    const initStatus = () => {
-      return;
-      if (!self.isTree) {
-        const { nodes = [], edges = [] } = props.data as GraphinData;
-        nodes.forEach((node) => {
-          const { status } = node;
-          if (status) {
-            Object.keys(status).forEach((k) => {
-              self.graph.setItemState(node.id, k, Boolean(status[k]));
-            });
-          }
-        });
-        edges.forEach((edge) => {
-          const { status } = edge;
-          if (status) {
-            Object.keys(status).forEach((k) => {
-              self.graph.setItemState(edge.id, k, Boolean(status[k]));
-            });
-          }
-        });
-      }
+      self.data = cloneDeep(newData);
     };
 
     const initGraphInstance = () => {
@@ -228,20 +201,13 @@ const Graphin = defineComponent({
 
       /** 初始化布局：仅限网图 */
       if (!self.isTree) {
-        // 这里需要将layoutContext当作graphin的对象传到LayoutController里面，所以先将graphDOM赋值以下
+        // 这里需要将self当作graphin的对象传到LayoutController里面，所以先将graphDOM赋值以下
         const { nodes, edges, combos } = self.data
-        layoutContext.value = markRaw({
-          context: contextRef,
-          props: {...props},
-          width: self.width,
-          height: self.height,
-          graphDOM: graphDOM.value,
-          data: toRaw(self.data),
-          graph: self.graph,
-          options: self.options,
-        })
-        console.log('new LayoutController', layoutContext)
-        contextRef.layout = self.layout = new LayoutController(layoutContext.value);
+        self.graphDOM = graphDOM.value
+        self.context = contextRef
+        self.props = markRaw({...props})
+        console.log('new LayoutController', self)
+        contextRef.layout = self.layout = new LayoutController(self);
         self.layout.start();
       }
 
@@ -257,6 +223,29 @@ const Graphin = defineComponent({
       self.isReady = true;
     };
 
+    /** 初始化状态 */
+    const initStatus = () => {
+      if (!self.isTree) {
+        const { nodes = [], edges = [] } = props.data as GraphinData;
+        nodes.forEach((node) => {
+          const { status } = node;
+          if (status) {
+            Object.keys(status).forEach((k) => {
+              self.graph.setItemState(node.id, k, Boolean(status[k]));
+            });
+          }
+        });
+        edges.forEach((edge) => {
+          const { status } = edge;
+          if (status) {
+            Object.keys(status).forEach((k) => {
+              self.graph.setItemState(edge.id, k, Boolean(status[k]));
+            });
+          }
+        });
+      }
+    };
+
     onMounted(() => {
       initGraphInstance();
     });
@@ -265,20 +254,36 @@ const Graphin = defineComponent({
     watch(
       () => props.data,
       (v) => {
-        console.log('watch dataChange')
+        /** 数据变化 */
         if (!deepEqual(toRaw(v), toRaw(self.data))) {
-          console.log('dataChange')
           initData(v);
 
-          const newData = toRaw(self.data)
-          self.graph.data(newData as GraphData | TreeGraphData);
-          // self.graph.set('layoutController', null);
-          self.graph.changeData(newData as GraphData | TreeGraphData);
+          if (self.isTree) {
+            self.graph.changeData(this.data as TreeGraphData);
+          } else {
+            // 更新拖拽后的节点的mass到data
+            // @ts-ignore
+            self.data?.nodes?.forEach(node => {
+              const dragNode = contextRef.dragNodes.find(item => item.id === node.id);
+              if (dragNode) {
+                node.layout = {
+                  ...node.layout,
+                  force: {
+                    mass: dragNode.layout?.force?.mass,
+                  },
+                };
+              }
+            })
+          }
+
+          self.graph.data(self.data as GraphData | TreeGraphData);
+          self.graph.set('layoutController', null);
+          self.graph.changeData(self.data as GraphData | TreeGraphData);
 
           // 由于 changeData 是将 this.data 融合到 item models 上面，因此 changeData 后 models 与 this.data 不是同一个引用了
           // 执行下面一行以保证 graph item model 中的数据与 this.data 是同一份
           // @ts-ignore
-          layoutContext.value.data = self.layout.getDataFromGraph();
+          self.data = self.layout.getDataFromGraph();
           self.layout.changeLayout();
 
           initStatus();
@@ -290,8 +295,22 @@ const Graphin = defineComponent({
     // layout 更新
     watch(
       () => props.layout,
-      () => {
+      (layout, prevLayout) => {
+        if (self.isTree) {
+          self.graph.updateLayout(layout);
+          return
+        }
+        /**
+         * TODO
+         * 1. preset 前置布局判断问题
+         * 2. enablework 问题
+         * 3. G6 LayoutController 里的逻辑
+         */
+        /** 数据需要从画布中来 */
+        // @ts-ignore
+        self.data = self.layout.getDataFromGraph()
         self.layout.changeLayout();
+        self.graph.emit('graphin:layoutchange', { prevLayout: prevLayout, layout });
       },
     );
 
