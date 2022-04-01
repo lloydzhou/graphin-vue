@@ -62,7 +62,7 @@ const Graphin = defineComponent({
     }
   },
 
-  components: { ResizeCanvas },
+  components: { DragCanvas, ZoomCanvas, DragNode, DragCombo, ClickSelect, BrushSelect, ResizeCanvas },
 
   setup(props) {
 

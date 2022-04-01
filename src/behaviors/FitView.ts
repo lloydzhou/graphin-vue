@@ -23,7 +23,6 @@ const FitView = defineComponent({
       setTimeout(() => {
         const nodeSize = graph.getNodes().length
         if (nodeSize > 0) {
-          console.log('FitView', graph, padding)
           graph.fitView(padding)
         }
       }, 60)
