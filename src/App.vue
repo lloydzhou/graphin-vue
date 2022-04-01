@@ -10,7 +10,7 @@
     <DragNode />
     <Hoverable />
     <LassoSelect />
-    <!-- <FitView /> -->
+    <FitView />
     <!-- <TreeCollapse /> -->
     <!-- <DragNodeWithForce /> -->
   </Graphin>
