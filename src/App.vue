@@ -10,6 +10,7 @@
     <DragNode />
     <Hoverable />
     <LassoSelect />
+    <!-- <FitView /> -->
     <!-- <TreeCollapse /> -->
     <!-- <DragNodeWithForce /> -->
   </Graphin>
@@ -86,6 +87,7 @@ export default class App extends Component {
   }
 
   created() {
+
     setTimeout(() => this.name = 'lloyd', 2000)
     console.log('created', this)
     // @ts-ignore
@@ -95,11 +97,11 @@ export default class App extends Component {
       this.data = Utils.mock(10).circle().graphin()
       console.log('update data', this.data)
     }, 3000)
-    setTimeout(() => {
-      // @ts-ignore
-      this.data = Utils.mock(100).circle().graphin()
-      console.log('update data', this.data)
-    }, 10000)
+    // setTimeout(() => {
+    //   // @ts-ignore
+    //   this.data = Utils.mock(100).circle().graphin()
+    //   console.log('update data', this.data)
+    // }, 10000)
   }
 
 }

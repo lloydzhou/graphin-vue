@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { provide, inject, shallowReactive, defineComponent } from 'vue'
+import { provide, inject } from 'vue'
 
 export const contextSymbol = String(Symbol('contextSymbol'))
 
@@ -12,7 +12,7 @@ export const useContext = () => {
   if (!context) {
     throw new Error('context must be used after useProvide')
   }
-  return context.value ? context.value : context
+  return context
 }
 
 export default {
@@ -21,19 +21,3 @@ export default {
   useContext,
 }
 
-// export default defineComponent({
-//   name: 'Provide',
-//   props: {
-//     value: {
-//       type: Object,
-//       default () {
-//         return {}
-//       }
-//     }
-//   },
-//   setup (props, context) {
-//     contextValue = shallowReactive(props.value)
-//     createContext(contextValue)
-//     return () => <div>{ context.slots.default() }</div>
-//   }
-// })
