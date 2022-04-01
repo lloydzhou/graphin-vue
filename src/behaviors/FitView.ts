@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { watchEffect, defineComponent, nextTick } from 'vue'
+import { defineComponent, onMounted, onUnmounted } from 'vue'
 import { useContext, contextSymbol } from '../GraphinContext'
 
 const FitView = defineComponent({
@@ -7,7 +7,7 @@ const FitView = defineComponent({
   props: {
     padding: {
       type: Array,
-      default: () => [20, 20],
+      default: () => [],
     },
     isBindLayoutChange: {
       type: Boolean,
@@ -18,29 +18,26 @@ const FitView = defineComponent({
   setup (props) {
     const { padding, isBindLayoutChange } = props
     const { graph } = useContext()
-    watchEffect((onInvalidate) => {
-      const handleFitView = () => {
+    const handleFitView = () => {
+      /* afterlayout事件触发后，还需要等refreshPisitions完成再执行fitView */
+      setTimeout(() => {
         const nodeSize = graph.getNodes().length
         if (nodeSize > 0) {
           graph.fitView(padding)
         }
-      }
+      }, 60)
+    }
+    onMounted(() => {
       /** 第一次就执行 FitView */
-      // nextTick(() => {
-      //   handleFitView()
-      // })
-      // 直接执行会导致出问题，可能画面里面没有元素，延时一下
-      setTimeout(() => {
-        handleFitView()
-      }, 100)
+      handleFitView()
       if (isBindLayoutChange) {
         graph.on('afterlayout', handleFitView)
       }
-      onInvalidate(() => {
-        if (isBindLayoutChange) {
-          graph.off('afterlayout', handleFitView)
-        }
-      })
+    })
+    onUnmounted(() => {
+      if (isBindLayoutChange) {
+        graph.off('afterlayout', handleFitView)
+      }
     })
     return () => null
   }

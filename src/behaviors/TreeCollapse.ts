@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { watchEffect, defineComponent } from 'vue'
+import { onMounted, onUnmounted, defineComponent } from 'vue'
 import { useContext, contextSymbol } from '../GraphinContext'
 
 const defaultConfig = {
@@ -31,7 +31,19 @@ const TreeCollapse = defineComponent({
     } = props
     const { ...otherConfig } = context
     const { graph } = useContext()
-    watchEffect((onInvalidate) => {
+
+    const handleChange = (e) => {
+      const {
+        item,
+        collapsed
+      } = e
+      const model = item.get('model')
+      model.collapsed = collapsed
+      if (onChange) {
+        onChange(item, collapsed) // callback
+      }
+    }
+    onMounted(() => {
       graph.removeBehaviors(type, mode)
       if (disabled) {
         return
@@ -41,24 +53,13 @@ const TreeCollapse = defineComponent({
         ...defaultConfig,
         ...otherConfig
       }, mode)
-      const handleChange = (e) => {
-        const {
-          item,
-          collapsed
-        } = e
-        const model = item.get('model')
-        model.collapsed = collapsed
-        if (onChange) {
-          onChange(item, collapsed) // callback
-        }
-      }
       graph.on('itemcollapsed', handleChange)
-      onInvalidate(() => {
-        graph.off('itemcollapsed', handleChange)
-        if (!graph.destroyed) {
-          graph.removeBehaviors(type, mode)
-        }
-      })
+    })
+    onUnmounted(() => {
+      graph.off('itemcollapsed', handleChange)
+      if (!graph.destroyed) {
+        graph.removeBehaviors(type, mode)
+      }
     })
     return () => null
   }
