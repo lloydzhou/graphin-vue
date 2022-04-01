@@ -6,6 +6,7 @@ yarn.lock
 *.log
 
 .DS_Store
+/src
 /dist
 /example
 /node_modules
