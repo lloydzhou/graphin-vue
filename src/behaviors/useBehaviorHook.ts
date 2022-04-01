@@ -23,7 +23,8 @@ const useBehaviorHook = (params) => {
       const { ...otherConfig } = context.attrs
 
       onMounted(() => {
-        graph.removeBehaviors(type, mode);
+        /** 保持单例 */
+        graph!.removeBehaviors(type, mode);
         if (disabled) {
           return
         }
