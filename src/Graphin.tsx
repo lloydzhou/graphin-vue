@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { defineComponent, onMounted, onUnmounted, ref, watch, toRaw, shallowRef, computed, reactive , toRefs, toRef, markRaw, shallowReactive } from 'vue';
+import { defineComponent, onMounted, onUnmounted, ref, watch, toRaw, toRef, markRaw, shallowReactive } from 'vue';
 
 import G6, { Graph as IGraph, GraphData, GraphOptions, TreeGraphData } from '@antv/g6';
 // import React, { ErrorInfo } from 'react';
@@ -15,9 +15,10 @@ import { DEFAULT_TREE_LATOUT_OPTIONS, TREE_LAYOUTS } from '@antv/graphin/es/cons
 import './index.less';
 /** 内置布局 */
 import LayoutController from '@antv/graphin/es/layout';
-import { getDefaultStyleByTheme, ThemeData } from '@antv/graphin/es/theme/index';
+// import { getDefaultStyleByTheme, ThemeData } from '@antv/graphin/es/theme/index';
+import { ThemeData } from '@antv/graphin/es/theme/index';
 /** types  */
-import { GraphinData, GraphinProps, GraphinTreeData, IconLoader, IUserNode } from '@antv/graphin/es/typings/type';
+import { GraphinData, GraphinProps, GraphinTreeData, IUserNode } from '@antv/graphin/es/typings/type';
 import cloneDeep from '@antv/graphin/es/utils/cloneDeep';
 /** utils */
 // import shallowEqual from './utils/shallowEqual';
@@ -25,7 +26,6 @@ import deepEqual from '@antv/graphin/es/utils/deepEqual';
 
 const { DragCanvas, ZoomCanvas, DragNode, DragCombo, ClickSelect, BrushSelect, ResizeCanvas } = Behaviors;
 import {createContext} from './GraphinContext'
-import { omit } from 'lodash'
 
 
 export class GraphinInstance {
@@ -81,34 +81,36 @@ const Graphin = defineComponent({
 
   components: { ResizeCanvas },
 
-  setup(props, { slots }) {
+  setup(props) {
+
+    const { data, layout, width, height, layoutCache, ...otherOptions } = props;
 
     /** 传递给LayoutController的对象 */
-    const self = new GraphinInstance(props)
+    const self = markRaw({
+      props,
+      data,
+      isTree:
+        Boolean(props.data && (props.data as GraphinTreeData).children) ||
+        TREE_LAYOUTS.indexOf(String(layout && layout.type)) !== -1,
+      graph: {} as IGraph,
+      height: Number(height),
+      width: Number(width),
+
+      theme: {} as ThemeData,
+      apis: {} as ApisType,
+      layoutCache,
+      layout: {} as LayoutController,
+      dragNodes: [] as IUserNode[],
+
+      options: { ...otherOptions } as GraphOptions,
+
+      isReady: false
+    })
+    // self.props不会同步变化
+    watch(() => props, (newProps) => self.props = {...newProps})
+
     /** Graph的DOM */
     const graphDOM = ref<HTMLDivElement | null>(null);
-
-    // 这里模拟处理@antv/Graphin组件的constructor逻辑
-    // self.props不会同步变化
-    watch(() => props, (newProps) => self.props = markRaw({...newProps}))
-    const { data, layout, width, height, layoutCache, ...otherOptions } = props;
-    self.data = data;
-    self.isTree =
-      Boolean(props.data && (props.data as GraphinTreeData).children) ||
-      TREE_LAYOUTS.indexOf(String(layout && layout.type)) !== -1;
-    self.graph = {} as IGraph;
-    self.height = Number(height);
-    self.width = Number(width);
-
-    self.theme = {} as ThemeData;
-    self.apis = {} as ApisType;
-    self.layoutCache = layoutCache;
-    self.layout = {} as LayoutController;
-    self.dragNodes = [] as IUserNode[];
-
-    self.options = { ...otherOptions } as GraphOptions;
-
-    self.isReady = false
 
     /** createContext内的数据 */
     const contextRef = shallowReactive({
@@ -161,17 +163,17 @@ const Graphin = defineComponent({
       self.width = Number(width) || clientWidth || 500;
       self.height = Number(height) || clientHeight || 500;
 
-      const themeResult = getDefaultStyleByTheme(props.theme);
+      // const themeResult = getDefaultStyleByTheme(props.theme);
 
-      const {
-        defaultNodeStyle,
-        defaultEdgeStyle,
-        defaultComboStyle,
-        defaultNodeStatusStyle,
-        defaultEdgeStatusStyle,
-        defaultComboStatusStyle,
-        ...otherTheme
-      } = themeResult;
+      // const {
+      //   defaultNodeStyle,
+      //   defaultEdgeStyle,
+      //   defaultComboStyle,
+      //   defaultNodeStatusStyle,
+      //   defaultEdgeStatusStyle,
+      //   defaultComboStatusStyle,
+      //   ...otherTheme
+      // } = themeResult;
 
       /** graph type */
       self.isTree =
@@ -220,7 +222,6 @@ const Graphin = defineComponent({
       /** 初始化布局：仅限网图 */
       if (!self.isTree) {
         // 这里需要将self当作graphin的对象传到LayoutController里面，所以先将graphDOM赋值以下
-        const { nodes, edges, combos } = self.data
         self.graphDOM = graphDOM.value
         self.context = contextRef
         self.props = markRaw({...props})
