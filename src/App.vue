@@ -36,7 +36,6 @@ import Utils from '@antv/graphin/es/utils'
 // import Graphin from './Graphin'
 // import Behaviors from './behaviors'
 // import Graphin, { Behaviors } from '../dist/index.es'
-import { GraphinInstance } from './Graphin'
 import Graphin, { Behaviors } from './graphin'
 const {
   /** 内置 */
@@ -88,10 +87,6 @@ export default class App extends Component {
   }
 
   created() {
-
-    const instance = new GraphinInstance({})
-    console.log('instance', instance)
-    instance.name = 1
 
     setTimeout(() => this.name = 'lloyd', 2000)
     console.log('created', this)

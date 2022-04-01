@@ -27,22 +27,6 @@ const { DragCanvas, ZoomCanvas, DragNode, DragCombo, ClickSelect, BrushSelect, R
 import {createContext} from './GraphinContext'
 
 
-export class GraphinInstance {
-  constructor() {
-    this.data = markRaw({});
-    return new Proxy(this, {
-      get: function(self, field) {
-        return self.data[field]
-      },
-      set: function(self, field, value) {
-        self.data = {...self.data, [field]: toRaw(value)}
-        return true
-      },
-    });
-  }
-}
-
-
 const Graphin = defineComponent({
 
   name: "Graphin",
