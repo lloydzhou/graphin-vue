@@ -29,7 +29,7 @@ const defaultConfig = {
   includeEdges: true
 }
 const LassoSelect = useBehaviorHook({
-  type: 'LassoSelect',
+  name: 'LassoSelect',
   type: 'lasso-select',
   defaultConfig
 })
