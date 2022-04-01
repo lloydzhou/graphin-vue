@@ -206,7 +206,6 @@ const Graphin = defineComponent({
         self.graphDOM = graphDOM.value
         self.context = contextRef
         self.props = markRaw({...props})
-        console.log('new LayoutController', self)
         contextRef.layout = self.layout = new LayoutController(self);
         self.layout.start();
       }
@@ -263,17 +262,20 @@ const Graphin = defineComponent({
           } else {
             // 更新拖拽后的节点的mass到data
             // @ts-ignore
-            self.data?.nodes?.forEach(node => {
-              const dragNode = contextRef.dragNodes.find(item => item.id === node.id);
-              if (dragNode) {
-                node.layout = {
-                  ...node.layout,
-                  force: {
-                    mass: dragNode.layout?.force?.mass,
-                  },
-                };
-              }
-            })
+            if (self.data.nodes && self.data.nodes.length > 0) {
+              self.data.nodes.forEach(node => {
+                const dragNode = contextRef.dragNodes.find(item => item.id === node.id);
+                if (dragNode) {
+                  const { force={} } = dragNode.layout || {}
+                  node.layout = {
+                    ...node.layout,
+                    force: {
+                      mass: force.mass,
+                    },
+                  };
+                }
+              })
+            }
           }
 
           self.graph.data(self.data as GraphData | TreeGraphData);
@@ -342,7 +344,6 @@ const Graphin = defineComponent({
   },
   render() {
     const { theme, graphStyle, isReady, modes, graphDOM } = this;
-    console.log('render', this)
     return (
       <div id="graphin-container">
         <div
