@@ -23,7 +23,6 @@ const useBehaviorHook = (params) => {
       const { ...otherConfig } = context.attrs
 
       onMounted(() => {
-        console.log('onMounted')
         graph.removeBehaviors(type, mode);
         if (disabled) {
           return

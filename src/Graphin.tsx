@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { defineComponent, onMounted, onUnmounted, ref, watch, toRaw, shallowRef, computed, reactive , toRefs, toRef, markRaw} from 'vue';
+import { defineComponent, onMounted, onUnmounted, ref, watch, toRaw, shallowRef, computed, reactive , toRefs, toRef, markRaw, shallowReactive } from 'vue';
 
 import G6, { Graph as IGraph, GraphData, GraphOptions, TreeGraphData } from '@antv/g6';
 // import React, { ErrorInfo } from 'react';
@@ -17,7 +17,7 @@ import './index.less';
 import LayoutController from '@antv/graphin/es/layout';
 import { getDefaultStyleByTheme, ThemeData } from '@antv/graphin/es/theme/index';
 /** types  */
-import { GraphinData, GraphinProps, GraphinTreeData, IconLoader } from '@antv/graphin/es/typings/type';
+import { GraphinData, GraphinProps, GraphinTreeData, IconLoader, IUserNode } from '@antv/graphin/es/typings/type';
 import cloneDeep from '@antv/graphin/es/utils/cloneDeep';
 /** utils */
 // import shallowEqual from './utils/shallowEqual';
@@ -73,10 +73,6 @@ const Graphin = defineComponent({
       type: Object,
       default: () => ({default: []})
     },
-    theme: {
-      type: Object,
-      default: () => ({})
-    },
     graphStyle: {
       type: Object,
       default: () => ({})
@@ -100,14 +96,12 @@ const Graphin = defineComponent({
     const graphDOM = ref<HTMLDivElement | null>(null);
 
     /** createContext内的数据 */
-    const contextRef = computed(() => {
-      return {
-        apis: self.apis,
-        theme: self.theme,
-        graph: (self.graph || {}) as IGraph,
-        layout: self.layout as LayoutController,
-        dragNodes: self.dragNodes,
-      };
+    const contextRef = shallowReactive({
+      graph: {} as IGraph,
+      apis: {} as ApisType,
+      theme: {} as ThemeType,
+      layout: {} as LayoutController,
+      dragNodes: [],
     });
 
     createContext(contextRef);
@@ -116,7 +110,7 @@ const Graphin = defineComponent({
       if ((newData as GraphinTreeData).children) {
         self.isTree = true;
       }
-      self.data = toRaw({ ...newData });
+      self.data = { ...newData };
     };
 
     /** 初始化状态 */
@@ -160,7 +154,7 @@ const Graphin = defineComponent({
         animate,
         handleAfterLayout,
         ...otherOptions
-      } = toRaw(props);
+      } = props;
 
       if (modes.default.length > 0) {
         // TODO :给用户正确的引导，推荐使用Graphin的Behaviors组件
@@ -192,18 +186,18 @@ const Graphin = defineComponent({
       self.isTree =
         Boolean((data as GraphinTreeData).children) || TREE_LAYOUTS.indexOf(String(props.layout && props.layout.type)) !== -1;
 
-      const finalStyle = {
-        defaultNode: { style: { ...defaultNode.style, _theme: toRaw(theme) }, type: defaultNode.type || 'graphin-circle' }, // isGraphinNodeType ? deepMix({}, defaultNodeStyle, defaultNode) : defaultNode,
-        defaultEdge: { style: { ...defaultEdge.style, _theme: toRaw(theme) }, type: defaultEdge.type || 'graphin-line' }, // isGraphinEdgeType ? deepMix({}, defaultEdgeStyle, defaultEdge) : defaultEdge,
-        defaultCombo: { style: { ...defaultCombo.style, _theme: toRaw(theme) }, type: defaultCombo.type || 'combo' }, // deepMix({}, defaultComboStyle, defaultCombo), // TODO:COMBO的样式需要内部自定义
+      const finalStyle = markRaw({
+        defaultNode: { style: { ...defaultNode.style, _theme: theme }, type: defaultNode.type || 'graphin-circle' }, // isGraphinNodeType ? deepMix({}, defaultNodeStyle, defaultNode) : defaultNode,
+        defaultEdge: { style: { ...defaultEdge.style, _theme: theme }, type: defaultEdge.type || 'graphin-line' }, // isGraphinEdgeType ? deepMix({}, defaultEdgeStyle, defaultEdge) : defaultEdge,
+        defaultCombo: { style: { ...defaultCombo.style, _theme: theme }, type: defaultCombo.type || 'combo' }, // deepMix({}, defaultComboStyle, defaultCombo), // TODO:COMBO的样式需要内部自定义
         /** status 样式 */
         nodeStateStyles, // isGraphinNodeType ? deepMix({}, defaultNodeStatusStyle, nodeStateStyles) : nodeStateSty    les,
         edgeStateStyles, // isGraphinEdgeType ? deepMix({}, defaultEdgeStatusStyle, edgeStateStyles) : edgeStateSty    les,
         comboStateStyles, // deepMix({}, defaultComboStatusStyle, comboStateStyles),
-      };
+      });
 
-      self.theme = { ...finalStyle, ...otherTheme } as unknown as ThemeData;
-      self.options = {
+      contextRef.theme = self.theme = { ...finalStyle, ...otherTheme } as unknown as ThemeData;
+      self.options = markRaw({
         container: graphDOM.value,
         renderer: 'canvas',
         width: self.width,
@@ -212,41 +206,42 @@ const Graphin = defineComponent({
         ...finalStyle,
         modes,
         ...otherOptions,
-      } as GraphOptions;
+      }) as GraphOptions;
 
       if (self.isTree) {
         self.options.layout = layout || DEFAULT_TREE_LATOUT_OPTIONS,
-        self.graph = new G6.TreeGraph(toRaw(self.options) as GraphOptions);
+        self.graph = new G6.TreeGraph(self.options as GraphOptions);
       } else {
-        self.graph = new G6.Graph(toRaw(self.options) as GraphOptions);
+        self.graph = new G6.Graph(self.options as GraphOptions);
       }
+      contextRef.graph = self.graph
 
       /** 内置事件:AfterLayout 回调 */
       self.graph.on('afterlayout', () => {
         if (handleAfterLayout) {
-          handleAfterLayout(toRaw(self.graph) as IGraph);
+          handleAfterLayout(self.graph as IGraph);
         }
       });
 
       /** 装载数据 */
-      self.graph.data(toRaw(self.data) as GraphData | TreeGraphData);
+      self.graph.data(self.data as GraphData | TreeGraphData);
 
       /** 初始化布局：仅限网图 */
       if (!self.isTree) {
         // 这里需要将layoutContext当作graphin的对象传到LayoutController里面，所以先将graphDOM赋值以下
         const { nodes, edges, combos } = self.data
-        layoutContext.value = {
-          context: contextRef.value,
-          props,
+        layoutContext.value = markRaw({
+          context: contextRef,
+          props: {...props},
           width: self.width,
           height: self.height,
           graphDOM: graphDOM.value,
-          data: self.data,
+          data: toRaw(self.data),
           graph: self.graph,
           options: self.options,
-        }
+        })
         console.log('new LayoutController', layoutContext)
-        self.layout = new LayoutController(layoutContext.value);
+        contextRef.layout = self.layout = new LayoutController(layoutContext.value);
         self.layout.start();
       }
 
@@ -257,7 +252,7 @@ const Graphin = defineComponent({
       /** 初始化状态 */
       initStatus();
       /** 生成API */
-      self.apis = ApiController(toRaw(self.graph) as IGraph);
+      contextRef.apis = ApiController(self.graph as IGraph);
 
       self.isReady = true;
     };
@@ -283,11 +278,11 @@ const Graphin = defineComponent({
           // 由于 changeData 是将 this.data 融合到 item models 上面，因此 changeData 后 models 与 this.data 不是同一个引用了
           // 执行下面一行以保证 graph item model 中的数据与 this.data 是同一份
           // @ts-ignore
-          self.data = self.layout.getDataFromGraph();
+          layoutContext.value.data = self.layout.getDataFromGraph();
           self.layout.changeLayout();
 
           initStatus();
-          self.apis = ApiController(toRaw(self.graph) as IGraph);
+          contextRef.apis = ApiController(self.graph as IGraph);
           self.graph.emit('graphin:datachange');
         }
       },
@@ -323,6 +318,7 @@ const Graphin = defineComponent({
     return {
       graphDOM,
       isReady: toRef(self, 'isReady'),
+      theme: toRef(self, 'theme'),
     }
   },
   render() {
