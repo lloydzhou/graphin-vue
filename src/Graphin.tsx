@@ -15,8 +15,7 @@ import { DEFAULT_TREE_LATOUT_OPTIONS, TREE_LAYOUTS } from '@antv/graphin/es/cons
 import './index.less';
 /** 内置布局 */
 import LayoutController from '@antv/graphin/es/layout';
-// import { getDefaultStyleByTheme, ThemeData } from '@antv/graphin/es/theme/index';
-import { ThemeData } from '@antv/graphin/es/theme/index';
+import { getDefaultStyleByTheme, ThemeData } from '@antv/graphin/es/theme/index';
 /** types  */
 import { GraphinData, GraphinProps, GraphinTreeData, IUserNode } from '@antv/graphin/es/typings/type';
 import cloneDeep from '@antv/graphin/es/utils/cloneDeep';
@@ -163,17 +162,17 @@ const Graphin = defineComponent({
       self.width = Number(width) || clientWidth || 500;
       self.height = Number(height) || clientHeight || 500;
 
-      // const themeResult = getDefaultStyleByTheme(props.theme);
+      const themeResult = getDefaultStyleByTheme(props.theme);
 
-      // const {
-      //   defaultNodeStyle,
-      //   defaultEdgeStyle,
-      //   defaultComboStyle,
-      //   defaultNodeStatusStyle,
-      //   defaultEdgeStatusStyle,
-      //   defaultComboStatusStyle,
-      //   ...otherTheme
-      // } = themeResult;
+      const {
+        defaultNodeStyle,
+        defaultEdgeStyle,
+        defaultComboStyle,
+        defaultNodeStatusStyle,
+        defaultEdgeStatusStyle,
+        defaultComboStatusStyle,
+        ...otherTheme
+      } = themeResult;
 
       /** graph type */
       self.isTree =
