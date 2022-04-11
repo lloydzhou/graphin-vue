@@ -11,6 +11,7 @@
     <Hoverable />
     <LassoSelect />
     <FitView />
+    <MiniMap />
     <!-- <TreeCollapse /> -->
     <!-- <DragNodeWithForce /> -->
   </Graphin>
@@ -36,7 +37,7 @@ import Utils from '@antv/graphin/es/utils'
 // import Graphin from './Graphin'
 // import Behaviors from './behaviors'
 // import Graphin, { Behaviors } from '../dist/index.es'
-import Graphin, { Behaviors } from './index'
+import Graphin, { Behaviors, Components } from './index'
 const {
   /** 内置 */
   DragCanvas,
@@ -56,6 +57,11 @@ const {
   DragNodeWithForce,
 } = Behaviors;
 
+const {
+  /** 内置组件 */
+  MiniMap,
+} = Components;
+
 
 @Options({
   components: {
@@ -73,6 +79,7 @@ const {
     LassoSelect,
     TreeCollapse,
     DragNodeWithForce,
+    MiniMap,
   },
 })
 export default class App extends Component {

@@ -4,6 +4,7 @@ import Graphin from './Graphin'
 //utils 工具
 import Utils from "@antv/graphin/es/utils/index"
 import Behaviors from './behaviors';
+import Components from './components';
 import GraphinContext  from './GraphinContext';
 
 import registerGraphinForce from '@antv/graphin/es/layout/inner/registerGraphinForce';
@@ -41,6 +42,7 @@ export {
   Graphin,
   Utils,
   Behaviors,
+  Components,
   GraphinContext,
   registerNode,
   registerEdge,
