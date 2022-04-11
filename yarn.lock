@@ -214,9 +214,10 @@
   dependencies:
     "@antv/g6-pc" "0.6.4"
 
-"@antv/graphin@https://gitpkg.now.sh/lloydzhou/Graphin/packages/graphin?4f4fdee5":
-  version "2.5.1"
-  resolved "https://gitpkg.now.sh/lloydzhou/Graphin/packages/graphin?4f4fdee5#d42c587cdf863d3becc84f14a9b2a3560b75affe"
+"@antv/graphin@^2.6.0":
+  version "2.6.0"
+  resolved "https://registry.yarnpkg.com/@antv/graphin/-/graphin-2.6.0.tgz#5aa80858679fe5bd195469ce0bde1b44f1ecd553"
+  integrity sha512-0bD2aPSPYXxsPb5cmhmCCd5tgJqCaxF1DeM3LmszRp+KkE7utNw7tdR/+25Ta+K1dj1n5HI7QydagRQNTavxqw==
   dependencies:
     "@antv/g6" "^4.6.0-beta.3"
     "@antv/util" "^2.0.10"

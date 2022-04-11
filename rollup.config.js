@@ -15,11 +15,11 @@ export default {
   output: [{
     name: 'graphin-vue',
     format: 'umd',
-    file: "dist/index.jsx",
+    file: "dist/index.js",
     banner: '// @ts-nocheck\nimport {h} from "vue"\n',
   }, {
     format: 'es',
-    file: "dist/index.es.jsx",
+    file: "dist/index.es.js",
     banner: '// @ts-nocheck\nimport {h} from "vue"\n',
   }],
   plugins: [

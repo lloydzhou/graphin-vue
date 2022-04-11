@@ -1,6 +1,6 @@
 {
   "name": "antv-graphin-vue",
-  "version": "0.2.4",
+  "version": "0.2.6",
   "description": "the vue toolkit for graph analysis based on g6, based on @antv/graphin",
   "scripts": {
     "prepare": "install-peers",
@@ -12,8 +12,8 @@
     "type": "git",
     "url": "https://github.com/lloydzhou/graphin-vue.git"
   },
-  "main": "dist/index.tsx",
-  "module": "dist/index.es.tsx",
+  "main": "dist/index.js",
+  "module": "dist/index.es.js",
   "peerDependencies": {
     "@antv/g6": "^4.3.4",
     "core-js": "^3.6.5",
@@ -22,7 +22,7 @@
     "vue-class-component": "^8.0.0-rc.1"
   },
   "dependencies": {
-    "@antv/graphin": "https://gitpkg.now.sh/lloydzhou/Graphin/packages/graphin?4f4fdee5"
+    "@antv/graphin": "^2.6.0"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^4.18.0",
