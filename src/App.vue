@@ -15,11 +15,13 @@
     <ContextMenu>
       <template #default="scope">
         <Menu @click="hendleContextMenuClick(scope, $event)">
+          <MenuItem key="fishEye">鱼眼</MenuItem>
           <MenuItem key="1">item1</MenuItem>
           <MenuItem key="2">item2</MenuItem>
         </Menu>
       </template>
     </ContextMenu>
+    <FishEye v-if="fishEyeVisible" :handleEscListener="handleEscListener" />
     <!-- <TreeCollapse /> -->
     <!-- <DragNodeWithForce /> -->
   </Graphin>
@@ -72,6 +74,7 @@ const {
   /** 内置组件 */
   MiniMap,
   ContextMenu,
+  FishEye,
 } = Components;
 
 const MenuItem = Menu.Item
@@ -95,6 +98,7 @@ const MenuItem = Menu.Item
     MiniMap,
     ContextMenu,
     Menu, MenuItem,
+    FishEye,
   },
 })
 export default class App extends Component {
@@ -107,11 +111,19 @@ export default class App extends Component {
       type: 'grid',
     }
   }
+  fishEyeVisible = false
 
   hendleContextMenuClick(data, event) {
     const { onClose } = data
     console.log('hendleContextMenuClick', data, event)
     onClose && onClose()
+    if (event.key == 'fishEye') {
+      this.fishEyeVisible = true
+    }
+  }
+
+  handleEscListener(ev) {
+    this.fishEyeVisible = false
   }
 
   created() {

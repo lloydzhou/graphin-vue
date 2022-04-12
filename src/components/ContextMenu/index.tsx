@@ -1,7 +1,5 @@
 // @ts-nocheck
-import { defineComponent, CSSProperties, onMounted, onUnmounted, ref, watch } from 'vue';
-import G6 from '@antv/g6'
-import { useContext, contextSymbol } from '../../GraphinContext'
+import { defineComponent, CSSProperties, ref } from 'vue';
 
 import useContextMenu from './useContextMenu'
 
@@ -22,9 +20,8 @@ const ContextMenu = defineComponent({
       default: () => ({})
     },
   },
-  inject: [contextSymbol],
-  setup(props, { slots }) {
-    const { bindType, style } = props;
+  setup(props) {
+    const { bindType } = props;
     const container = ref<HTMLDivElement | null>(null);
     const contextmenu = useContextMenu({
       bindType,
@@ -38,7 +35,7 @@ const ContextMenu = defineComponent({
   },
 
   render() {
-    const { container, style, visible, x, y, item, onClose } = this
+    const { style, visible, x, y, item, onClose } = this
 
     const positionStyle: CSSProperties = {
       position: 'absolute',

@@ -1,4 +1,4 @@
-import { onMounted, onUnmounted, toRefs, reactive, shallowReactive } from 'vue'
+import { onMounted, onUnmounted, toRefs, reactive } from 'vue'
 import { IG6GraphEvent } from '@antv/g6'
 import { useContext } from '../../GraphinContext';
 
