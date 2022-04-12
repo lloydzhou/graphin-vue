@@ -12,13 +12,24 @@
     <LassoSelect />
     <FitView />
     <MiniMap />
+    <ContextMenu>
+      <template #default="scope">
+        <Menu @click="hendleContextMenuClick(scope, $event)">
+          <MenuItem key="1">item1</MenuItem>
+          <MenuItem key="2">item2</MenuItem>
+        </Menu>
+      </template>
+    </ContextMenu>
     <!-- <TreeCollapse /> -->
     <!-- <DragNodeWithForce /> -->
   </Graphin>
 </template>
 <script lang="ts">
 // @ts-nocheck
+import { defineComponent } from 'vue'
 import { Options, Vue as Component } from 'vue-class-component';
+import { Menu } from 'ant-design-vue';
+import 'ant-design-vue/es/menu/style/css'
 import Utils from '@antv/graphin/es/utils'
 // import ZoomCanvas from './behaviors/ZoomCanvas'
 // import FitView from './behaviors/FitView'
@@ -60,8 +71,10 @@ const {
 const {
   /** 内置组件 */
   MiniMap,
+  ContextMenu,
 } = Components;
 
+const MenuItem = Menu.Item
 
 @Options({
   components: {
@@ -80,6 +93,8 @@ const {
     TreeCollapse,
     DragNodeWithForce,
     MiniMap,
+    ContextMenu,
+    Menu, MenuItem,
   },
 })
 export default class App extends Component {
@@ -91,6 +106,12 @@ export default class App extends Component {
     preset: {
       type: 'grid',
     }
+  }
+
+  hendleContextMenuClick(data, event) {
+    const { onClose } = data
+    console.log('hendleContextMenuClick', data, event)
+    onClose && onClose()
   }
 
   created() {
