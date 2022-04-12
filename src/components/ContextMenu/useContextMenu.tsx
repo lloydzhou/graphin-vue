@@ -31,7 +31,6 @@ const useContextMenu = (props: ContextMenuProps) => {
   })
 
   const handleShow = (e: IG6GraphEvent) => {
-    console.log('handleShow', e)
     e.preventDefault();
     e.stopPropagation();
 

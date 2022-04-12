@@ -30,16 +30,7 @@ const ContextMenu = defineComponent({
       bindType,
       container,
     });
-    watch(() => contextmenu, (contextmenu) => {
-      const { visible, x, y, item } = contextmenu;
-      console.log('contextmenu', contextmenu)
-    })
-    const { visible, x, y, item } = contextmenu;
 
-    // if (typeof children !== 'function') {
-    //   console.error('<ContextMenu /> children should be a function');
-    //   return null;
-    // }
     return {
       ...contextmenu,
       container,
@@ -55,7 +46,6 @@ const ContextMenu = defineComponent({
       top: y + 'px',
     };
     const id = (item && !item.destroyed && item.getModel && item.getModel().id) || '';
-    console.log('positionStyle', positionStyle)
 
     return (
       <div
