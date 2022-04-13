@@ -15,7 +15,6 @@ const defaultStyle: CSSProperties = {
 function Legend(props, { slots }) {
   const { bindType = 'node', sortKey, style } = props;
   const { dataMap, options } = useLegend({ bindType, sortKey })
-  console.log('render Legend', dataMap, options)
   return (
     <div
       className="graphin-components-legend"

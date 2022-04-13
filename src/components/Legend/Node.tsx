@@ -56,7 +56,6 @@ const LegendNode = defineComponent({
   },
   render() {
     const { options, items, mode, handleClick, dataMap } = this
-    console.log('dataMap', dataMap, options, items)
     return (
       <ul className="graphin-components-legend-content">
         {items.map((option: OptionType) => {

@@ -26,10 +26,8 @@ const useLegend = (props: LegendProps) => {
       // @ts-ignore
       const dataMap = getEnumDataMap(data[`${bindType}s`], sortKey);
 
-      console.log('dataMap', dataMap)
-
       /** 计算legend.content 的 options */
-      const keys = [...dataMap.keys()];
+      const keys = Array.from(dataMap.keys());
       const options = keys.map(key => {
         const item = (dataMap.get(key) || [{}])[0];
 
