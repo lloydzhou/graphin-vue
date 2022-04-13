@@ -149,8 +149,10 @@ const useTooltip = (props: Props) => {
     graph.on(`node:dragstart`, handleDragStart);
     graph.on(`node:dragend`, handleDragEnd);
 
-    container.value?.addEventListener('mouseenter', removeTimer);
-    container.value?.addEventListener('mouseleave', handleClose);
+    if (container.value) {
+      container.value.addEventListener('mouseenter', removeTimer);
+      container.value.addEventListener('mouseleave', handleClose);
+    }
   })
   onUnmounted(() => {
     // @ts-ignore
@@ -160,8 +162,10 @@ const useTooltip = (props: Props) => {
     graph.off(`afterremoveitem`, handleClose);
     graph.off(`node:dragstart`, handleDragStart);
     graph.off(`node:dragend`, handleDragEnd);
-    container.current?.removeEventListener('mouseenter', removeTimer);
-    container.current?.removeEventListener('mouseleave', handleClose);
+    if (container.value) {
+      container.value.removeEventListener('mouseenter', removeTimer);
+      container.value.removeEventListener('mouseleave', handleClose);
+    }
   })
 
   return {
