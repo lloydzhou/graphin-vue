@@ -37,6 +37,11 @@
         </div>
       </template>
     </Tooltip>
+    <Legend bindType="node" sortKey="data.type">
+      <template #default="scope">
+        <LegendNode :options="scope.options" :dataMap="scope.dataMap"/>
+      </template>
+    </Legend>
     <!-- <TreeCollapse /> -->
     <!-- <DragNodeWithForce /> -->
   </Graphin>
@@ -48,6 +53,8 @@ import { Options, Vue as Component } from 'vue-class-component';
 import { Menu } from 'ant-design-vue';
 import 'ant-design-vue/es/menu/style/css'
 import Utils from '@antv/graphin/es/utils'
+import iconsLoader from '@antv/graphin-icons';
+import '@antv/graphin-icons/dist/index.css';
 // import ZoomCanvas from './behaviors/ZoomCanvas'
 // import FitView from './behaviors/FitView'
 // import FontPaint from './behaviors/FontPaint'
@@ -65,7 +72,7 @@ import Utils from '@antv/graphin/es/utils'
 // import Graphin from './Graphin'
 // import Behaviors from './behaviors'
 // import Graphin, { Behaviors } from '../dist/index.es'
-import Graphin, { Behaviors, Components } from './index'
+import Graphin, { Behaviors, Components, registerFontFamily } from './index'
 const {
   /** 内置 */
   DragCanvas,
@@ -93,9 +100,21 @@ const {
   Hull,
   SnapLine,
   Tooltip,
+  Legend,
 } = Components;
 
 const MenuItem = Menu.Item
+const LegendNode = Legend.Node
+
+const icons = registerFontFamily(iconsLoader);
+const Color = {
+  company: {
+    primaryColor: '#ffc107',
+  },
+  person: {
+    primaryColor: '#28a52d',
+  },
+};
 
 @Options({
   components: {
@@ -120,6 +139,7 @@ const MenuItem = Menu.Item
     Hull,
     SnapLine,
     Tooltip,
+    Legend, LegendNode,
   },
 })
 export default class App extends Component {
@@ -167,15 +187,44 @@ export default class App extends Component {
     this.fishEyeVisible = false
   }
 
+  processNode() {
+    this.data.nodes.forEach((node, index) => {
+      const isCompany = index % 3 === 0;
+      const iconType = isCompany ? 'company' : 'person';
+      node.data = {
+        type: iconType,
+      };
+      node.type = 'graphin-circle';
+      const { primaryColor } = Color[iconType];
+      node.style = {
+        keyshape: {
+          size: 30,
+          stroke: primaryColor,
+          fill: primaryColor,
+          fillOpacity: 0.2,
+        },
+        icon: {
+          type: 'font',
+          fontFamily: 'graphin',
+          value: isCompany ? icons.company : icons.user,
+          size: 14,
+          fill: primaryColor,
+        },
+      };
+    });
+  }
+
   created() {
 
     setTimeout(() => this.name = 'lloyd', 2000)
     console.log('created', this)
     // @ts-ignore
     this.data = Utils.mock(8).circle().graphin()
+    this.processNode()
     setTimeout(() => {
       // @ts-ignore
       this.data = Utils.mock(10).circle().graphin()
+      this.processNode()
       console.log('update data', this.data)
     }, 3000)
     // setTimeout(() => {

@@ -234,6 +234,11 @@
   dependencies:
     "@antv/g6-pc" "0.6.4"
 
+"@antv/graphin-icons@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@antv/graphin-icons/-/graphin-icons-1.0.0.tgz#86ba9e9ab6565bfe2ea1096e8678e76c279053f1"
+  integrity sha512-2nogK6ZrDklnfIOJrqOAgD7iFLjfZIjLbA8pDUbeXN5c9b0Mu84oCfyqg8OmWwvi9Gt80eUzoplo73gKjZECJg==
+
 "@antv/graphin@^2.6.0":
   version "2.6.0"
   resolved "https://registry.yarnpkg.com/@antv/graphin/-/graphin-2.6.0.tgz#5aa80858679fe5bd195469ce0bde1b44f1ecd553"

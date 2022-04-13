@@ -1,6 +1,7 @@
 import { onMounted, onUnmounted, toRefs, reactive } from 'vue'
 import { IG6GraphEvent } from '@antv/g6'
 import { useContext } from '../../GraphinContext';
+import useState from '../../state'
 
 export interface ContextMenuProps {
   bindType?: 'node' | 'edge' | 'canvas';
@@ -23,12 +24,12 @@ const useContextMenu = (props: ContextMenuProps) => {
   // @ts-ignore
   const { graph } = useContext();
 
-  const state = reactive<State>({
+  const [state, setState] = useState({
     visible: false,
     x: 0,
     y: 0,
     item: null,
-  })
+  } as State)
 
   const handleShow = (e: IG6GraphEvent) => {
     e.preventDefault();
@@ -73,17 +74,28 @@ const useContextMenu = (props: ContextMenuProps) => {
     }
 
     /** 设置变量 */
-    state.visible = true
-    state.x = x
-    state.y = y
-    state.item = e.item
+    setState((preState: State) => {
+      return {
+        ...preState,
+        visible: true,
+        x,
+        y,
+        item: e.item,
+      };
+    })
   };
   const handleClose = () => {
-    if (state.visible) {
-      state.visible = false
-      state.x = 0
-      state.y = 0
-    }
+    setState((preState: State) => {
+      if (preState.visible) {
+        return {
+          ...preState,
+          visible: false,
+          x: 0,
+          y: 0,
+        };
+      }
+      return preState;
+    })
   };
 
   onMounted(() => {
@@ -102,7 +114,7 @@ const useContextMenu = (props: ContextMenuProps) => {
   })
 
   return {
-    ...toRefs(state),
+    ...state,
     oneShow: handleShow,
     onClose: handleClose,
   };

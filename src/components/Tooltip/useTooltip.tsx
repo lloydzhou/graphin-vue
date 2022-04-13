@@ -2,21 +2,7 @@
 import { onMounted, onUnmounted, toRefs, reactive, ref } from 'vue'
 import { IG6GraphEvent } from '@antv/g6'
 import { useContext } from '../../GraphinContext';
-
-
-const useState = (defaultState: any) => {
-  const state = reactive(defaultState)
-
-  const setState = (nextState: any, callback: any) => {
-    const finalState = typeof nextState == 'function' ? nextState(state) : nextState
-    for (const key in finalState) {
-      state[key] = finalState[key]
-    }
-    callback && callback(state)
-  }
-
-  return [state, setState]
-}
+import useState from '../../state'
 
 export interface Props {
   bindType?: 'node' | 'edge';
