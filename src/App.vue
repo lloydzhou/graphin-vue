@@ -24,6 +24,19 @@
     <FishEye v-if="fishEyeVisible" :handleEscListener="handleEscListener" />
     <!-- <Hull :options="hullOptions" /> -->
     <SnapLine :options="snaplineOptions" :visible="true" />
+    <Tooltip bindType="node" placement="right" :hasArrow="true">
+      <template #default="scope">
+        <div>
+          <li>{{scope.model.id}}</li>
+          <li>{{scope.model.id}}</li>
+          <li>{{scope.model.id}}</li>
+          <li>{{scope.model.id}}</li>
+          <li>{{scope.model.id}}</li>
+          <li>{{scope.model.id}}</li>
+          <li>{{scope.model.id}}</li>
+        </div>
+      </template>
+    </Tooltip>
     <!-- <TreeCollapse /> -->
     <!-- <DragNodeWithForce /> -->
   </Graphin>
@@ -79,6 +92,7 @@ const {
   FishEye,
   Hull,
   SnapLine,
+  Tooltip,
 } = Components;
 
 const MenuItem = Menu.Item
@@ -105,6 +119,7 @@ const MenuItem = Menu.Item
     FishEye,
     Hull,
     SnapLine,
+    Tooltip,
   },
 })
 export default class App extends Component {
