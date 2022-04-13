@@ -22,6 +22,8 @@
       </template>
     </ContextMenu>
     <FishEye v-if="fishEyeVisible" :handleEscListener="handleEscListener" />
+    <!-- <Hull :options="hullOptions" /> -->
+    <SnapLine :options="snaplineOptions" :visible="true" />
     <!-- <TreeCollapse /> -->
     <!-- <DragNodeWithForce /> -->
   </Graphin>
@@ -75,6 +77,8 @@ const {
   MiniMap,
   ContextMenu,
   FishEye,
+  Hull,
+  SnapLine,
 } = Components;
 
 const MenuItem = Menu.Item
@@ -99,6 +103,8 @@ const MenuItem = Menu.Item
     ContextMenu,
     Menu, MenuItem,
     FishEye,
+    Hull,
+    SnapLine,
   },
 })
 export default class App extends Component {
@@ -110,6 +116,26 @@ export default class App extends Component {
     preset: {
       type: 'grid',
     }
+  }
+  hullOptions = [
+    {
+      members: ['node-1', 'node-2'], // 必须参数
+    },
+    {
+      members: ['node-3', 'node-4'],
+      type: 'bubble',
+      padding: 10,
+      style: {
+        fill: 'lightgreen',
+        stroke: 'green',
+      },
+    },
+  ]
+  snaplineOptions = {
+    line: {
+      stroke: 'lightgreen',
+      lineWidth: 0.5,
+    },
   }
   fishEyeVisible = false
 
@@ -131,7 +157,7 @@ export default class App extends Component {
     setTimeout(() => this.name = 'lloyd', 2000)
     console.log('created', this)
     // @ts-ignore
-    this.data = Utils.mock(5).circle().graphin()
+    this.data = Utils.mock(8).circle().graphin()
     setTimeout(() => {
       // @ts-ignore
       this.data = Utils.mock(10).circle().graphin()
