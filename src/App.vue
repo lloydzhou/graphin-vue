@@ -22,7 +22,7 @@
       </template>
     </ContextMenu>
     <FishEye v-if="fishEyeVisible" :handleEscListener="handleEscListener" />
-    <!-- <Hull :options="hullOptions" /> -->
+    <Hull :options="hullOptions" />
     <SnapLine :options="snaplineOptions" :visible="true" />
     <Tooltip bindType="node" placement="right" :hasArrow="true">
       <template #default="scope">

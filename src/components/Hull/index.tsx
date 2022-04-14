@@ -2,6 +2,7 @@
 import G6 from '@antv/g6';
 import { useContext, contextSymbol } from '../../GraphinContext';
 import { defineComponent, onMounted, onUnmounted, ref } from 'vue';
+import { debounce } from '@antv/util'
 
 const defaultHullCfg = {
   members: [],
@@ -100,24 +101,33 @@ const Hull = defineComponent({
   setup(props) {
     const { graph } = useContext();
     const hullInstances = ref([])
-    const handleAfterUpdateItem = () => {
-      hullInstances.value.forEach(item => {
-        // 这里有bug，Hull.updateData报错
-        item.updateData(item.members);
+
+    const handleAfterUpdateItem = debounce(() => {
+      hullInstances.value.forEach((item, index) => {
+        // 这里有bug，Hull.updateData报错，实际上是因为数据更新后hull已经被destroy了，需要重新生成
+        if (item.group.destroyed) {
+          hullInstances.value[index] = graph.createHull(
+            // @ts-ignore
+            deepMergeCfg(defaultHullCfg, {
+              id: `hull_${Math.random()}`, // Utils.uuid(),
+              ...item,
+            }),
+          )
+        } else {
+          item.updateData(item.members);
+        }
       });
-    }
+    })
     onMounted(() => {
-      const { options } = props;
-      hullInstances.value = options.map(item => {
+      hullInstances.value = props.options.map(item => {
         return graph.createHull(
           // @ts-ignore
           deepMergeCfg(defaultHullCfg, {
-            id: `${Math.random()}`, // Utils.uuid(),
+            id: `hull_${Math.random()}`, // Utils.uuid(),
             ...item,
           }),
         );
       })
-      console.log('options', options, 'hullInstances', hullInstances.value)
       graph.on('afterupdateitem', handleAfterUpdateItem);
     })
     onUnmounted(() => {
