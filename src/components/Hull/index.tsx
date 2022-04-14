@@ -109,8 +109,8 @@ const Hull = defineComponent({
           hullInstances.value[index] = graph.createHull(
             // @ts-ignore
             deepMergeCfg(defaultHullCfg, {
-              id: `hull_${Math.random()}`, // Utils.uuid(),
-              ...item,
+              id: `{Math.random()}`, // Utils.uuid(),
+              ...props.options[index],
             }),
           )
         } else {
@@ -123,7 +123,7 @@ const Hull = defineComponent({
         return graph.createHull(
           // @ts-ignore
           deepMergeCfg(defaultHullCfg, {
-            id: `hull_${Math.random()}`, // Utils.uuid(),
+            id: `{Math.random()}`, // Utils.uuid(),
             ...item,
           }),
         );
