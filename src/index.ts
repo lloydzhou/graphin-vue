@@ -4,6 +4,7 @@ import Graphin from './Graphin'
 //utils 工具
 import Utils from "@antv/graphin/es/utils/index"
 import Behaviors from './behaviors';
+import Components from './components';
 import GraphinContext  from './GraphinContext';
 
 import registerGraphinForce from '@antv/graphin/es/layout/inner/registerGraphinForce';
@@ -35,12 +36,13 @@ registerGraphinLine();
 if (typeof window !== 'undefined' && window.Vue) {
   Graphin.install(window.Vue);
 }
+
 //导出
-export default Graphin
 export {
   Graphin,
   Utils,
   Behaviors,
+  Components,
   GraphinContext,
   registerNode,
   registerEdge,
@@ -49,10 +51,23 @@ export {
   registerFontFamily
 }
 
+export {
+  /** export G6 */
+  default as G6,
+  /** export G6 Type  */
+  // Graph,
+  // IG6GraphEvent,
+  // GraphData,
+  // TreeGraphData,
+  // NodeConfig,
+  // EdgeConfig,
+} from '@antv/g6';
+
 export interface GraphEvent extends MouseEvent {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   item: any;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   target: any;
 }
+export default Graphin
 

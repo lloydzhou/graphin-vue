@@ -11,14 +11,50 @@
     <Hoverable />
     <LassoSelect />
     <FitView />
+    <MiniMap />
+    <ContextMenu>
+      <template #default="scope">
+        <Menu @click="hendleContextMenuClick(scope, $event)">
+          <MenuItem key="fishEye">鱼眼</MenuItem>
+          <MenuItem key="1">item1</MenuItem>
+          <MenuItem key="2">item2</MenuItem>
+        </Menu>
+      </template>
+    </ContextMenu>
+    <FishEye v-if="fishEyeVisible" :handleEscListener="handleEscListener" />
+    <Hull :options="hullOptions" />
+    <SnapLine :options="snaplineOptions" :visible="true" />
+    <Tooltip bindType="node" placement="right" :hasArrow="true">
+      <template #default="scope">
+        <div>
+          <li>{{scope.model.id}}</li>
+          <li>{{scope.model.id}}</li>
+          <li>{{scope.model.id}}</li>
+          <li>{{scope.model.id}}</li>
+          <li>{{scope.model.id}}</li>
+          <li>{{scope.model.id}}</li>
+          <li>{{scope.model.id}}</li>
+        </div>
+      </template>
+    </Tooltip>
+    <Legend bindType="node" sortKey="data.type">
+      <template #default="scope">
+        <LegendNode :options="scope.options" :dataMap="scope.dataMap"/>
+      </template>
+    </Legend>
     <!-- <TreeCollapse /> -->
     <!-- <DragNodeWithForce /> -->
   </Graphin>
 </template>
 <script lang="ts">
 // @ts-nocheck
+import { defineComponent } from 'vue'
 import { Options, Vue as Component } from 'vue-class-component';
+import { Menu } from 'ant-design-vue';
+import 'ant-design-vue/es/menu/style/css'
 import Utils from '@antv/graphin/es/utils'
+import iconsLoader from '@antv/graphin-icons';
+import '@antv/graphin-icons/dist/index.css';
 // import ZoomCanvas from './behaviors/ZoomCanvas'
 // import FitView from './behaviors/FitView'
 // import FontPaint from './behaviors/FontPaint'
@@ -36,7 +72,7 @@ import Utils from '@antv/graphin/es/utils'
 // import Graphin from './Graphin'
 // import Behaviors from './behaviors'
 // import Graphin, { Behaviors } from '../dist/index.es'
-import Graphin, { Behaviors } from './graphin'
+import Graphin, { Behaviors, Components, registerFontFamily } from './index'
 const {
   /** 内置 */
   DragCanvas,
@@ -56,6 +92,29 @@ const {
   DragNodeWithForce,
 } = Behaviors;
 
+const {
+  /** 内置组件 */
+  MiniMap,
+  ContextMenu,
+  FishEye,
+  Hull,
+  SnapLine,
+  Tooltip,
+  Legend,
+} = Components;
+
+const MenuItem = Menu.Item
+const LegendNode = Legend.Node
+
+const icons = registerFontFamily(iconsLoader);
+const Color = {
+  company: {
+    primaryColor: '#ffc107',
+  },
+  person: {
+    primaryColor: '#28a52d',
+  },
+};
 
 @Options({
   components: {
@@ -73,6 +132,14 @@ const {
     LassoSelect,
     TreeCollapse,
     DragNodeWithForce,
+    MiniMap,
+    ContextMenu,
+    Menu, MenuItem,
+    FishEye,
+    Hull,
+    SnapLine,
+    Tooltip,
+    Legend, LegendNode,
   },
 })
 export default class App extends Component {
@@ -85,16 +152,79 @@ export default class App extends Component {
       type: 'grid',
     }
   }
+  hullOptions = [
+    {
+      members: ['node-1', 'node-2'], // 必须参数
+    },
+    {
+      members: ['node-3', 'node-4'],
+      type: 'bubble',
+      padding: 10,
+      style: {
+        fill: 'lightgreen',
+        stroke: 'green',
+      },
+    },
+  ]
+  snaplineOptions = {
+    line: {
+      stroke: 'lightgreen',
+      lineWidth: 0.5,
+    },
+  }
+  fishEyeVisible = false
+
+  hendleContextMenuClick(data, event) {
+    const { onClose } = data
+    console.log('hendleContextMenuClick', data, event)
+    onClose && onClose()
+    if (event.key == 'fishEye') {
+      this.fishEyeVisible = true
+    }
+  }
+
+  handleEscListener(ev) {
+    this.fishEyeVisible = false
+  }
+
+  processNode() {
+    this.data.nodes.forEach((node, index) => {
+      const isCompany = index % 3 === 0;
+      const iconType = isCompany ? 'company' : 'person';
+      node.data = {
+        type: iconType,
+      };
+      node.type = 'graphin-circle';
+      const { primaryColor } = Color[iconType];
+      node.style = {
+        keyshape: {
+          size: 30,
+          stroke: primaryColor,
+          fill: primaryColor,
+          fillOpacity: 0.2,
+        },
+        icon: {
+          type: 'font',
+          fontFamily: 'graphin',
+          value: isCompany ? icons.company : icons.user,
+          size: 14,
+          fill: primaryColor,
+        },
+      };
+    });
+  }
 
   created() {
 
     setTimeout(() => this.name = 'lloyd', 2000)
     console.log('created', this)
     // @ts-ignore
-    this.data = Utils.mock(5).circle().graphin()
+    this.data = Utils.mock(8).circle().graphin()
+    this.processNode()
     setTimeout(() => {
       // @ts-ignore
       this.data = Utils.mock(10).circle().graphin()
+      this.processNode()
       console.log('update data', this.data)
     }, 3000)
     // setTimeout(() => {
