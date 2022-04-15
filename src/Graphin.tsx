@@ -25,6 +25,7 @@ import deepEqual from '@antv/graphin/es/utils/deepEqual';
 
 const { DragCanvas, ZoomCanvas, DragNode, DragCombo, ClickSelect, BrushSelect, ResizeCanvas } = Behaviors;
 import {createContext} from './GraphinContext'
+import useState from './state'
 
 
 const Graphin = defineComponent({
@@ -96,15 +97,16 @@ const Graphin = defineComponent({
     const graphDOM = ref<HTMLDivElement | null>(null);
 
     /** createContext内的数据 */
-    const contextRef = shallowReactive({
-      graph: {} as IGraph,
-      apis: {} as ApisType,
-      theme: {} as ThemeType,
-      layout: {} as LayoutController,
-      dragNodes: [],
-    });
+    const [context, setContext] = useState({
+      graph: self.graph,
+      apis: self.apis,
+      theme: self.theme,
+      layout: self.layout,
+      dragNodes: self.dragNodes,
+      // updateContext: self.updateContext,
+    })
 
-    createContext(contextRef);
+    createContext(context);
 
     const initData = (newData: GraphinProps['data']) => {
       if ((newData as GraphinTreeData).children) {
@@ -146,7 +148,7 @@ const Graphin = defineComponent({
       self.width = Number(width) || clientWidth || 500;
       self.height = Number(height) || clientHeight || 500;
 
-      const themeResult = getDefaultStyleByTheme(props.theme);
+      const themeResult = getDefaultStyleByTheme(theme);
 
       const {
         defaultNodeStyle,
@@ -172,7 +174,7 @@ const Graphin = defineComponent({
         comboStateStyles, // deepMix({}, defaultComboStatusStyle, comboStateStyles),
       });
 
-      contextRef.theme = self.theme = { ...finalStyle, ...otherTheme } as unknown as ThemeData;
+      self.theme = { ...finalStyle, ...otherTheme } as unknown as ThemeData;
       self.options = markRaw({
         container: graphDOM.value,
         renderer: 'canvas',
@@ -190,7 +192,6 @@ const Graphin = defineComponent({
       } else {
         self.graph = new G6.Graph(self.options as GraphOptions);
       }
-      contextRef.graph = self.graph
 
       /** 内置事件:AfterLayout 回调 */
       self.graph.on('afterlayout', () => {
@@ -202,26 +203,32 @@ const Graphin = defineComponent({
       /** 装载数据 */
       self.graph.data(self.data as GraphData | TreeGraphData);
 
+      /** 渲染 */
+      self.graph.render();
+
       /** 初始化布局：仅限网图 */
       if (!self.isTree) {
         // 这里需要将self当作graphin的对象传到LayoutController里面，所以先将graphDOM赋值以下
-        self.graphDOM = graphDOM.value
-        self.context = contextRef
-        self.props = markRaw({...props})
-        contextRef.layout = self.layout = new LayoutController(self);
+        self.layout = new LayoutController(self);
         self.layout.start();
       }
 
-      /** 渲染 */
-      self.graph.render();
       /** FitView 变为组件可选 */
 
       /** 初始化状态 */
       initStatus();
       /** 生成API */
-      contextRef.apis = ApiController(self.graph as IGraph);
-
-      self.isReady = true;
+      self.apis = ApiController(self.graph as IGraph);
+      /** 设置Context */
+      self.isReady = true
+      setContext({
+        graph: self.graph,
+        apis: self.apis,
+        theme: self.theme,
+        layout: self.layout,
+        dragNodes: self.dragNodes,
+        // updateContext: self.updateContext,
+      })
     };
 
     /** 初始化状态 */
@@ -266,7 +273,7 @@ const Graphin = defineComponent({
           } else {
             // 若 dragNodes 中的节点已经不存在，则从数组中删去
             // @ts-ignore
-            newDragNodes = self.dragNodes.filter(
+            newDragNodes = context.dragNodes.filter(
               dNode => (self.data as GraphinData).nodes && (self.data as GraphinData).nodes.find(node => node.id === dNode.id),
             );
             // 更新拖拽后的节点的mass到data
@@ -298,9 +305,20 @@ const Graphin = defineComponent({
           self.layout.changeLayout();
 
           initStatus();
-          contextRef.apis = ApiController(self.graph as IGraph);
-          contextRef.dragNodes = self.dragNodes = newDragNodes || self.dragNodes
-          self.graph.emit('graphin:datachange');
+          self.apis = ApiController(self.graph as IGraph);
+          setContext((preContext) => {
+            return {
+              graph: self.graph,
+              apis: self.apis,
+              theme: self.theme,
+              layout: self.layout,
+              dragNodes: newDragNodes || preContext.dragNodes,
+              // updateContext: self.updateContext,
+            }
+          }, () => {
+            self.graph.emit('graphin:datachange');
+            // @antv/graphin库这里还有一个isLayoutChange的判断，这里不需要
+          })
         }
       },
     );
@@ -322,7 +340,11 @@ const Graphin = defineComponent({
         // @ts-ignore
         self.data = self.layout.getDataFromGraph()
         self.layout.changeLayout();
-        self.graph.emit('graphin:layoutchange', { prevLayout: prevLayout, layout });
+        self.layout.refreshPosition();
+
+        /** 走G6的layoutController */
+        // self.graph.updateLayout();
+        self.graph.emit('graphin:layoutchange', { prevLayout, layout });
       },
     );
 
