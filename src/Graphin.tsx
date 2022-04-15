@@ -255,6 +255,8 @@ const Graphin = defineComponent({
     watch(
       () => props.data,
       (v) => {
+        let newDragNodes: IUserNode[];
+
         /** 数据变化 */
         if (!deepEqual(toRaw(v), toRaw(self.data))) {
           initData(v);
@@ -262,11 +264,16 @@ const Graphin = defineComponent({
           if (self.isTree) {
             self.graph.changeData(self.data as TreeGraphData);
           } else {
+            // 若 dragNodes 中的节点已经不存在，则从数组中删去
+            // @ts-ignore
+            newDragNodes = self.dragNodes.filter(
+              dNode => (self.data as GraphinData).nodes && (self.data as GraphinData).nodes.find(node => node.id === dNode.id),
+            );
             // 更新拖拽后的节点的mass到data
             // @ts-ignore
             if (self.data.nodes && self.data.nodes.length > 0) {
               self.data.nodes.forEach(node => {
-                const dragNode = contextRef.dragNodes.find(item => item.id === node.id);
+                const dragNode = newDragNodes.find(item => item.id === node.id);
                 if (dragNode) {
                   const { force={} } = dragNode.layout || {}
                   node.layout = {
@@ -292,6 +299,7 @@ const Graphin = defineComponent({
 
           initStatus();
           contextRef.apis = ApiController(self.graph as IGraph);
+          contextRef.dragNodes = self.dragNodes = newDragNodes || self.dragNodes
           self.graph.emit('graphin:datachange');
         }
       },
