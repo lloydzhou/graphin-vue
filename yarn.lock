@@ -239,10 +239,10 @@
   resolved "https://registry.yarnpkg.com/@antv/graphin-icons/-/graphin-icons-1.0.0.tgz#86ba9e9ab6565bfe2ea1096e8678e76c279053f1"
   integrity sha512-2nogK6ZrDklnfIOJrqOAgD7iFLjfZIjLbA8pDUbeXN5c9b0Mu84oCfyqg8OmWwvi9Gt80eUzoplo73gKjZECJg==
 
-"@antv/graphin@^2.6.0":
-  version "2.6.0"
-  resolved "https://registry.yarnpkg.com/@antv/graphin/-/graphin-2.6.0.tgz#5aa80858679fe5bd195469ce0bde1b44f1ecd553"
-  integrity sha512-0bD2aPSPYXxsPb5cmhmCCd5tgJqCaxF1DeM3LmszRp+KkE7utNw7tdR/+25Ta+K1dj1n5HI7QydagRQNTavxqw==
+"@antv/graphin@^2.6.3":
+  version "2.6.3"
+  resolved "https://registry.yarnpkg.com/@antv/graphin/-/graphin-2.6.3.tgz#1ee3b6491aa7aada9bc9a8df77c84aab87b61000"
+  integrity sha512-go5xiIKtMhioS0yC2DSjBFsWih+69YTe3dALC6m7gRymLjUNW4SSdSy5GNDY8vZ7ZASfyGk8Nse1ILmlB8X+FA==
   dependencies:
     "@antv/g6" "^4.6.0-beta.3"
     "@antv/util" "^2.0.10"
