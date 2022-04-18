@@ -12,7 +12,7 @@ import Behaviors from './behaviors';
 import { DEFAULT_TREE_LATOUT_OPTIONS, TREE_LAYOUTS } from '@antv/graphin/es/consts';
 /** Context */
 // import GraphinContext from './GraphinContext';
-import './index.less';
+import '@antv/graphin/es/index.css'
 /** 内置布局 */
 import LayoutController from '@antv/graphin/es/layout';
 import { getDefaultStyleByTheme, ThemeData } from '@antv/graphin/es/theme/index';

@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { defineComponent, CSSProperties, ref } from 'vue';
+import '@antv/graphin/es/components/ContextMenu/index.css'
 
 import useContextMenu from './useContextMenu'
 
@@ -35,7 +36,7 @@ const ContextMenu = defineComponent({
   },
 
   render() {
-    const { style, visible, x, y, item, onClose } = this
+    const { style, visible, x, y, item, onClose, selectedItems } = this
 
     const positionStyle: CSSProperties = {
       position: 'absolute',
@@ -55,6 +56,7 @@ const ContextMenu = defineComponent({
           this.$slots.default({
             visible, x, y, item, onClose,
             id,
+            selectedItems,
           })}
       </div>
     );

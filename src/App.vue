@@ -21,6 +21,13 @@
         </Menu>
       </template>
     </ContextMenu>
+    <ContextMenu bindType="canvas">
+      <template #default="scope">
+        <Menu>
+          <MenuItem key="hull" @click="handleChangeHull(scope, $event)">使用轮廓包裹</MenuItem>
+        </Menu>
+      </template>
+    </ContextMenu>
     <FishEye v-if="fishEyeVisible" :handleEscListener="handleEscListener" />
     <Hull :options="hullOptions" />
     <SnapLine :options="snaplineOptions" :visible="true" />
@@ -181,6 +188,27 @@ export default class App extends Component {
     if (event.key == 'fishEye') {
       this.fishEyeVisible = true
     }
+  }
+
+  handleChangeHull(data, event) {
+    const { selectedItems={}, onClose } = data
+    const nodes = selectedItems.nodes || [];
+    if (nodes.length) {
+      const members = nodes.map((item: any) => {
+        return item.get('id');
+      }) as string[];
+      const newHullOptions = {
+        members,
+        type: 'bubble',
+        padding: 10,
+        style: {
+          fill: 'lightgreen',
+          stroke: 'green',
+        },
+      };
+      this.hullOptions = [{...newHullOptions}]
+    }
+    onClose && onClose()
   }
 
   handleEscListener(ev) {
