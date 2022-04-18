@@ -1,7 +1,7 @@
 // @ts-nocheck
 import G6 from '@antv/g6';
 import { useContext, contextSymbol } from '../../GraphinContext';
-import { defineComponent, onMounted, onUnmounted, ref } from 'vue';
+import { defineComponent, onMounted, onUnmounted, ref, watch } from 'vue';
 import { debounce } from '@antv/util'
 
 const defaultHullCfg = {
@@ -118,7 +118,8 @@ const Hull = defineComponent({
         }
       });
     })
-    onMounted(() => {
+
+    const createHulls = () => {
       hullInstances.value = props.options.map(item => {
         return graph.createHull(
           // @ts-ignore
@@ -128,6 +129,16 @@ const Hull = defineComponent({
           }),
         );
       })
+    }
+    watch(() => props.options, () => {
+      // 如果options有更改，先删除再创建
+      if (hullInstances.value && hullInstances.value.length) {
+        hullInstances.value.forEach(item => graph.removeHull(item));
+      }
+      createHulls()
+    })
+    onMounted(() => {
+      createHulls()
       graph.on('afterupdateitem', handleAfterUpdateItem);
       graph.on('aftergraphrefreshposition', handleAfterUpdateItem);
     })
