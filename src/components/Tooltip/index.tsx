@@ -2,7 +2,7 @@
 import { defineComponent, CSSProperties, ref } from 'vue';
 import getContainerStyles from './getContainerStyles';
 import useTooltip from './useTooltip'
-import './index.less'
+import '@antv/graphin/es/components/Tooltip/index.css'
 
 export interface TooltipValue {
   bindType: 'node' | 'edge';

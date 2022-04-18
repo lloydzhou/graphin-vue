@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { defineComponent, watch, toRefs } from 'vue';
-import './index.less';
+import '@antv/graphin/es/components/Legend/index.css'
 import { useContext } from '../../GraphinContext';
 import useState from '../../state';
 import deepEqual from '@antv/graphin/es/utils/deepEqual';

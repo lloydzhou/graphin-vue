@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { defineComponent, CSSProperties, ref } from 'vue';
-import './index.less'
+import '@antv/graphin/es/components/ContextMenu/index.css'
 
 import useContextMenu from './useContextMenu'
 

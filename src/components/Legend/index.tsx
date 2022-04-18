@@ -1,6 +1,5 @@
 // @ts-nocheck
 import { defineComponent, CSSProperties, ref, watchEffect, toRaw } from 'vue';
-import './index.less'
 import Node from './Node';
 import type { LegendProps } from './typing';
 import useLegend from './useLegend';
