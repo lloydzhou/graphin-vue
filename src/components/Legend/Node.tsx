@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { defineComponent, watch, toRefs } from 'vue';
+import { defineComponent, watch, toRefs, Fragment } from 'vue';
 import '@antv/graphin/es/components/Legend/index.css'
 import { useContext } from '../../GraphinContext';
 import useState from '../../state';
@@ -58,7 +58,7 @@ const LegendNode = defineComponent({
     const { options, items, mode, handleClick, dataMap } = this
     return (
       <ul className="graphin-components-legend-content">
-        {items.map((option: OptionType) => {
+        {items.map((option: OptionType, index: number) => {
           const { label, checked, color } = option;
           const dotColors = {
             light: {
@@ -93,10 +93,18 @@ const LegendNode = defineComponent({
                 handleClick(option);
               }}
             >
-              <span className="dot" style={{ background: dotColors[mode][status] }} />
-              <span className="label" style={{ color: labelColor[mode][status] }}>
-                {label}
-              </span>
+              {this.$slots.default ? this.$slots.default({
+                dotColor: dotColors[mode][status],
+                labelColor: labelColor[mode][status],
+                label,
+                option,
+                data: dataMap.get(option.value),
+              }) : (<Fragment>
+                <span className="dot" style={{ background: dotColors[mode][status] }} />
+                <span className="label" style={{ color: labelColor[mode][status] }}>
+                  {label}
+                </span>
+              </Fragment>)}
             </li>
           );
         })}

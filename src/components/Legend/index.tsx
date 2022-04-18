@@ -24,9 +24,9 @@ function Legend(props, { slots }) {
         bindType,
         sortKey,
         // @ts-ignore
-        dataMap,
+        dataMap: dataMap.value,
         // @ts-ignore
-        options,
+        options: options.value,
       })}
     </div>
   )
