@@ -24,14 +24,9 @@ export interface State {
 
 export const usePotision = (props: any) => {
   // @ts-ignore
-  const { container, graph, e } = props
+  const { graph, e } = props
   const width: number = graph.get('width');
   const height: number = graph.get('height');
-  if (!container.value) {
-    return;
-  }
-
-  const bbox = container.value.getBoundingClientRect();
 
   const offsetX = graph.get('offsetX') || 0;
   const offsetY = graph.get('offsetY') || 0;
@@ -39,18 +34,10 @@ export const usePotision = (props: any) => {
   const graphTop = graph.getContainer().offsetTop;
   const graphLeft = graph.getContainer().offsetLeft;
 
-  let x = e.canvasX + graphLeft + offsetX;
-  let y = e.canvasY + graphTop + offsetY;
+  const x = e.canvasX + graphLeft + offsetX;
+  const y = e.canvasY + graphTop + offsetY;
 
-  // when the menu is (part of) out of the canvas
-
-  if (x + bbox.width > width) {
-    x = e.canvasX - bbox.width - offsetX + graphLeft;
-  }
-  if (y + bbox.height > height) {
-    y = e.canvasY - bbox.height - offsetY + graphTop;
-  }
-  return { x, y }
+  return { x, y, offsetX, offsetY, graphLeft, graphTop, height, width }
 }
 
 
@@ -71,8 +58,25 @@ const useContextMenu = (props: ContextMenuProps) => {
     e.preventDefault();
     e.stopPropagation();
 
+    if (!container.value) {
+      return;
+    }
+
+    const bbox = container.value.getBoundingClientRect();
+
     // @ts-ignore
-    let { x, y } = usePotision({ container, e, graph })
+    const position = usePotision({ graph, e })
+    let { x, y } = position
+    const { offsetX, offsetY, graphLeft, graphTop, width, height } = position
+
+    // when the menu is (part of) out of the canvas
+
+    if (x + bbox.width > width) {
+      x = e.canvasX - bbox.width - offsetX + graphLeft;
+    }
+    if (y + bbox.height > height) {
+      y = e.canvasY - bbox.height - offsetY + graphTop;
+    }
 
     if (bindType === 'node') {
       // 如果是节点，则x，y指定到节点的中心点
