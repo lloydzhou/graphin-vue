@@ -1,5 +1,5 @@
 import ContextMenu from './ContextMenu';
-import useContextMenu, { usePotision } from './ContextMenu/useContextMenu';
+import useContextMenu from './ContextMenu/useContextMenu';
 import FishEye from './FishEye';
 import Hull from './Hull';
 import Legend from './Legend';
@@ -17,7 +17,6 @@ export default {
   MiniMap,
   SnapLine,
   Tooltip,
-  usePotision,
   useContextMenu,
   useLegend,
   useTooltip,

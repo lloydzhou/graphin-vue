@@ -22,25 +22,6 @@ export interface State {
   selectedItems: IG6GraphEvent['item'][];
 }
 
-export const usePotision = (props: any) => {
-  // @ts-ignore
-  const { graph, e } = props
-  const width: number = graph.get('width');
-  const height: number = graph.get('height');
-
-  const offsetX = graph.get('offsetX') || 0;
-  const offsetY = graph.get('offsetY') || 0;
-
-  const graphTop = graph.getContainer().offsetTop;
-  const graphLeft = graph.getContainer().offsetLeft;
-
-  const x = e.canvasX + graphLeft + offsetX;
-  const y = e.canvasY + graphTop + offsetY;
-
-  return { x, y, offsetX, offsetY, graphLeft, graphTop, height, width }
-}
-
-
 const useContextMenu = (props: ContextMenuProps) => {
   const { bindType = 'node', bindEvent='contextmenu', container } = props;
   // @ts-ignore
@@ -58,16 +39,22 @@ const useContextMenu = (props: ContextMenuProps) => {
     e.preventDefault();
     e.stopPropagation();
 
+    const width: number = graph.get('width');
+    const height: number = graph.get('height');
     if (!container.value) {
       return;
     }
 
     const bbox = container.value.getBoundingClientRect();
 
-    // @ts-ignore
-    const position = usePotision({ graph, e })
-    let { x, y } = position
-    const { offsetX, offsetY, graphLeft, graphTop, width, height } = position
+    const offsetX = graph.get('offsetX') || 0;
+    const offsetY = graph.get('offsetY') || 0;
+
+    const graphTop = graph.getContainer().offsetTop;
+    const graphLeft = graph.getContainer().offsetLeft;
+
+    let x = e.canvasX + graphLeft + offsetX;
+    let y = e.canvasY + graphTop + offsetY;
 
     // when the menu is (part of) out of the canvas
 
