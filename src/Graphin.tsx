@@ -12,7 +12,7 @@ import Behaviors from './behaviors';
 import { DEFAULT_TREE_LATOUT_OPTIONS, TREE_LAYOUTS } from '@antv/graphin/es/consts';
 /** Context */
 // import GraphinContext from './GraphinContext';
-import '@antv/graphin/es/index.css'
+// import '@antv/graphin/es/index.css'
 /** 内置布局 */
 import LayoutController from '@antv/graphin/es/layout';
 import { getDefaultStyleByTheme, ThemeData } from '@antv/graphin/es/theme/index';
@@ -56,10 +56,62 @@ const Graphin = defineComponent({
       type: Object,
       default: () => ({default: []})
     },
-    graphStyle: {
+    style: {
       type: Object,
       default: () => ({})
-    }
+    },
+    containerId: {
+      type: String,
+      default: () => ''
+    },
+    containerStyle: {
+      type: Object,
+      default: () => ({})
+    },
+    fitView: {
+      type: Boolean,
+      default: () => false
+    },
+    fitViewPadding: {
+      type: Number,
+      default: () => 0
+    },
+    fitCenter: {
+      type: Boolean,
+      default: () => false
+    },
+    linkCenter: {
+      type: Boolean,
+      default: () => false
+    },
+    groupByTypes: {
+      type: Boolean,
+      default: () => true
+    },
+    autoPaint: {
+      type: Boolean,
+      default: () => true
+    },
+    animate: {
+      type: Boolean,
+      default: () => false
+    },
+    animateCfg: {
+      type: Object,
+      default: () => ({})
+    },
+    minZoom: {
+      type: Number,
+      default: () => 0.2
+    },
+    maxZoom: {
+      type: Number,
+      default: () => 10
+    },
+    enabledStack: {
+      type: Boolean,
+      default: () => false
+    },
   },
 
   components: { DragCanvas, ZoomCanvas, DragNode, DragCombo, ClickSelect, BrushSelect, ResizeCanvas },
@@ -353,14 +405,25 @@ const Graphin = defineComponent({
     }
   },
   render() {
-    const { theme, graphStyle, isReady, modes, graphDOM } = this;
+    const { theme, style, isReady, modes, graphDOM, containerId, containerStyle } = this;
     return (
-      <div id="graphin-container">
+      <div id={containerId || "graphin-container"} style={{
+        height: '100%',
+        width: '100%',
+        position: 'relative',
+        ...containerStyle,
+      }}>
         <div
           data-testid="custom-element"
           class="graphin-core"
           ref="graphDOM"
-          style={{ background: theme ? theme.background : undefined, ...graphStyle }}
+          style={{
+            height: '100%',
+            width: '100%',
+            minHeight: '500px',
+            background: theme ? theme.background : undefined,
+            ...style
+          }}
         />
         <div class="graphin-components">
           {/** @ts-ignore */}

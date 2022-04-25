@@ -5,6 +5,7 @@ import useState from '../../state'
 
 export interface ContextMenuProps {
   bindType?: 'node' | 'edge' | 'canvas';
+  bindEvent?: 'click' | 'contextmenu';
   // container: React.RefObject<HTMLDivElement>;
   container: any;  // ref
 }
@@ -22,7 +23,7 @@ export interface State {
 }
 
 const useContextMenu = (props: ContextMenuProps) => {
-  const { bindType = 'node', container } = props;
+  const { bindType = 'node', bindEvent='contextmenu', container } = props;
   // @ts-ignore
   const { graph } = useContext();
 
@@ -112,8 +113,11 @@ const useContextMenu = (props: ContextMenuProps) => {
 
   onMounted(() => {
     // @ts-ignore
-    graph.on(`${bindType}:contextmenu`, handleShow);
-    graph.on('canvas:click', handleClose);
+    graph.on(`${bindType}:${bindEvent}`, handleShow);
+    // 如果是左键菜单，可能导致和canvans的click冲突
+    if (!(bindType == 'canvas' && bindEvent == 'click')) {
+      graph.on('canvas:click', handleClose);
+    }
     graph.on('canvas:drag', handleClose);
     graph.on('wheelzoom', handleClose);
     if (bindType === 'canvas') {
@@ -122,7 +126,7 @@ const useContextMenu = (props: ContextMenuProps) => {
   })
   onUnmounted(() => {
     // @ts-ignore
-    graph.off(`${bindType}:contextmenu`, handleShow);
+    graph.off(`${bindType}:${bindEvent}`, handleShow);
     graph.off('canvas:click', handleClose);
     graph.off('canvas:drag', handleClose);
     graph.off('wheelzoom', handleClose);

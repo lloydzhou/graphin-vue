@@ -46,7 +46,14 @@
     </Tooltip>
     <Legend bindType="node" sortKey="data.type">
       <template #default="scope">
-        <LegendNode :options="scope.options" :dataMap="scope.dataMap"/>
+        <LegendNode :options="scope.options" :dataMap="scope.dataMap">
+          <template #default="legend">
+            <span class="dot" :style="`background: ${legend.dotColor}`" />
+            <span class="label" :style="`color: ${legend.labelColor}`">
+              {{legend.label}}({{legend.data.length}})
+            </span>
+          </template>
+        </LegendNode>
       </template>
     </Legend>
     <!-- <TreeCollapse /> -->

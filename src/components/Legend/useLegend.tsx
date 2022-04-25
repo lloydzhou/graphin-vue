@@ -49,7 +49,7 @@ const useLegend = (props: LegendProps) => {
       setState({ dataMap, options })
     }
   })
-  return state
+  return toRefs(state)
 };
 export default useLegend;
 

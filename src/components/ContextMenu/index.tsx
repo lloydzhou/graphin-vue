@@ -16,16 +16,21 @@ const ContextMenu = defineComponent({
       type: String,
       default: () => 'node'
     },
+    bindEvent: {
+      type: String,
+      default: () => 'contextmenu'
+    },
     style: {
       type: Object,
       default: () => ({})
     },
   },
   setup(props) {
-    const { bindType } = props;
+    const { bindType, bindEvent } = props;
     const container = ref<HTMLDivElement | null>(null);
     const contextmenu = useContextMenu({
       bindType,
+      bindEvent,
       container,
     });
 
@@ -52,12 +57,14 @@ const ContextMenu = defineComponent({
         style={{ ...defaultStyle, ...style, ...positionStyle }}
         key={id}
       >
-        {visible && this.$slots.default &&
-          this.$slots.default({
+        {visible && this.$slots.default
+          ? this.$slots.default({
             visible, x, y, item, onClose,
             id,
             selectedItems,
-          })}
+          })
+          : null
+        }
       </div>
     );
   }
