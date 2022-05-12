@@ -1,6 +1,6 @@
 {
   "name": "antv-graphin-vue",
-  "version": "2.6.5",
+  "version": "2.6.6",
   "description": "the vue toolkit for graph analysis based on g6, based on @antv/graphin",
   "scripts": {
     "prepare": "install-peers",
@@ -21,7 +21,7 @@
     "vue": "^3.2.31"
   },
   "dependencies": {
-    "@antv/graphin": "^2.6.4"
+    "@antv/graphin": "^2.6.6"
   },
   "devDependencies": {
     "@antv/graphin-icons": "^1.0.0",
