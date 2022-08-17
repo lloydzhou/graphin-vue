@@ -2,7 +2,7 @@
 
 ## 核心思想
 1. 直接使用@antv/graphin内置的shape和layout逻辑代码
-> 使用一个移除react依赖的@antv/grapin核心库（详情 https://github.com/antvis/Graphin/pull/370）
+> 使用一个移除react依赖的@antv/grapin核心库（详情[antvis/Graphin#370](https://github.com/antvis/Graphin/pull/370)）
 > 可以在不依赖react的情况下使用graphin内置的shape和layout代码
 
 2. 使用vue重写ui组件以及behaviors组件以及components组件
