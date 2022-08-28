@@ -20,7 +20,7 @@ import Graphin, { Utils, Behaviors, Components } from 'antv-graphin-vue'
 const { DragCanvas, ZoomCanvas, DragNode, ResizeCanvas } = Behaviors
 const { MiniMap } = Components
 
-const App = definecomponent({
+const App = defineComponent({
   components: { Graphin, DragCanvas, ZoomCanvas, DragNode, ResizeCanvas, MiniMap },
   setup(props) {
     const state = reactive({
