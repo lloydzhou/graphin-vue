@@ -24,10 +24,8 @@ const LegendNode = defineComponent({
       items: props.options,
     });
 
-    watch(() => props.options, (items, prevItem) => {
-      if (deepEqual(items, prevItem)) {
-        setState({ items })
-      }
+    watch(() => props.options, (items) => {
+      setState({ items })
     })
 
     const handleClick = (option: OptionType) => {
