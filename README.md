@@ -3,7 +3,7 @@
 <a href="https://www.npmjs.com/package/antv-graphin-vue"><img alt="NPM Package" src="https://img.shields.io/npm/v/antv-graphin-vue.svg?style=flat-square"></a>
 <a href="https://www.npmjs.com/package/antv-graphin-vue"><img alt="NPM Size" src="https://img.shields.io/bundlephobia/minzip/antv-graphin-vue"></a>
 <a href="https://www.npmjs.com/package/antv-graphin-vue"><img alt="NPM Downloads" src="https://img.shields.io/npm/dm/antv-graphin-vue?logo=npm&style=flat-square"></a>
-<a href="/LICENSE"><img src="https://img.shields.io/github/license/lloydzhou/antv-graphin-vue?style=flat-square" alt="MIT License"></a>
+<a href="/LICENSE"><img src="https://img.shields.io/github/license/lloydzhou/graphin-vue?style=flat-square" alt="MIT License"></a>
 
 ## 核心思想
 1. 直接使用@antv/graphin内置的shape和layout逻辑代码
