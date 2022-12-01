@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { defineComponent, CSSProperties, ref } from 'vue';
+import { defineComponent, CSSProperties, ref, h } from 'vue';
 import getContainerStyles from './getContainerStyles';
 import useTooltip from './useTooltip'
 import '@antv/graphin/es/components/Tooltip/index.css'
@@ -56,58 +56,52 @@ const Tooltip = defineComponent({
       default: () => false,
     }
   },
-  setup(props) {
+  setup(props, { slots }) {
     const { bindType } = props;
     const container = ref<HTMLDivElement | null>(null);
     const tooltip = useTooltip({ bindType, container });
 
-    return {
-      ...tooltip,
-      container,
-    }
-  },
+    return () => {
+      const { visible, x, y, item } = tooltip
+      const { style, placement='top', hasArrow, bindType='node' } = props
+      let nodeSize = 40;
 
-  render() {
-    const { style, visible, x, y, item, placement='top', hasArrow, bindType='node' } = this
-    let nodeSize = 40;
-
-    try {
-      if (item) {
-        const { type } = item.getModel();
-        if (type === 'graphin-cirle') {
-          const { style } = item.getModel();
-          if (style) {
-            nodeSize = style.keyshape.size as number;
+      try {
+        if (item) {
+          const { type } = item.getModel();
+          if (type === 'graphin-cirle') {
+            const { style } = item.getModel();
+            if (style) {
+              nodeSize = style.keyshape.size as number;
+            }
           }
         }
+      } catch (error) {
+        console.log(error);
       }
-    } catch (error) {
-      console.log(error);
+      const padding = 12;
+      const containerPosition = getContainerStyles({ placement, nodeSize: nodeSize + padding, x, y, bindType, visible });
+
+      const positionStyle: CSSProperties = {
+        position: 'absolute',
+        ...containerPosition,
+        left: containerPosition.left + 'px',
+        top: containerPosition.top + 'px',
+      };
+
+      const model = (item && !item.destroyed && item.getModel && item.getModel()) || {};
+      const id = model.id || '';
+
+      return h('div', {
+        ref: container,
+        class: `graphin-components-tooltip ${placement}`,
+        style: { ...defaultStyle, ...style, ...positionStyle },
+        key: id,
+      }, [
+        visible && hasArrow ? h('div', {class: `tooltip-arrow ${placement}`}) : null,
+        visible && slots.default && slots.default({item, bindType, model, id}),
+      ])
     }
-    const padding = 12;
-    const containerPosition = getContainerStyles({ placement, nodeSize: nodeSize + padding, x, y, bindType, visible });
-
-    const positionStyle: CSSProperties = {
-      position: 'absolute',
-      ...containerPosition,
-      left: containerPosition.left + 'px',
-      top: containerPosition.top + 'px',
-    };
-
-    const model = (item && !item.destroyed && item.getModel && item.getModel()) || {};
-    const id = model.id || '';
-
-    return (
-      <div
-        ref="container"
-        className={`graphin-components-tooltip ${placement}`}
-        style={{ ...defaultStyle, ...style, ...positionStyle }}
-        key={id}
-      >
-        {visible && hasArrow ? <div className={`tooltip-arrow ${placement}`} /> : null}
-        {visible && this.$slots.default && this.$slots.default({item, bindType, model, id})}
-      </div>
-    );
   }
 })
 

@@ -134,9 +134,7 @@ const useTooltip = (props: Props) => {
     }
   })
 
-  return {
-    ...toRefs(state),
-  };
+  return state;
 };
 
 export default useTooltip;
