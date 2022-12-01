@@ -1,5 +1,5 @@
 <template>
-  <Graphin :data="data" :layout="layout">
+  <Graphin :data="data" :layout="layout" :theme="{mode: 'dark'}">
     <ActivateRelations trigger="mouseenter" />
     <BrushSelect />
     <ClickSelect />

@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { defineComponent, onMounted, onUnmounted, ref, watch, toRaw, toRef, markRaw, shallowReactive } from 'vue';
+import { defineComponent, onMounted, onUnmounted, ref, watch, toRaw, markRaw, shallowReactive } from 'vue';
 
 import G6, { Graph as IGraph, GraphData, GraphOptions, TreeGraphData } from '@antv/g6';
 // import React, { ErrorInfo } from 'react';
@@ -112,11 +112,15 @@ const Graphin = defineComponent({
       type: Boolean,
       default: () => false
     },
+    theme: {
+      type: Object,
+      default: () => ({})
+    },
   },
 
   components: { DragCanvas, ZoomCanvas, DragNode, DragCombo, ClickSelect, BrushSelect, ResizeCanvas },
 
-  setup(props) {
+  setup(props, { slots }) {
 
     const { data, layout, width, height, layoutCache, ...otherOptions } = props;
 
@@ -138,8 +142,6 @@ const Graphin = defineComponent({
       dragNodes: [] as IUserNode[],
 
       options: { ...otherOptions } as GraphOptions,
-
-      isReady: false
     })
     // self.props不会同步变化
     watch(() => props, (newProps) => self.props = {...newProps})
@@ -154,6 +156,7 @@ const Graphin = defineComponent({
       theme: {} as ThemeType,
       layout: {} as LayoutController,
       dragNodes: [],
+      isReady: false,
     });
 
     createContext(contextRef);
@@ -201,12 +204,12 @@ const Graphin = defineComponent({
       const themeResult = getDefaultStyleByTheme(props.theme);
 
       const {
-        defaultNodeStyle,
-        defaultEdgeStyle,
-        defaultComboStyle,
-        defaultNodeStatusStyle,
-        defaultEdgeStatusStyle,
-        defaultComboStatusStyle,
+        defaultNodeStyle = {},
+        defaultEdgeStyle = {},
+        defaultComboStyle = {},
+        defaultNodeStatusStyle = {},
+        defaultEdgeStatusStyle = {},
+        defaultComboStatusStyle = {},
         ...otherTheme
       } = themeResult;
 
@@ -215,13 +218,13 @@ const Graphin = defineComponent({
         Boolean((data as GraphinTreeData).children) || TREE_LAYOUTS.indexOf(String(props.layout && props.layout.type)) !== -1;
 
       const finalStyle = markRaw({
-        defaultNode: { style: { ...defaultNode.style, _theme: theme }, type: defaultNode.type || 'graphin-circle' }, // isGraphinNodeType ? deepMix({}, defaultNodeStyle, defaultNode) : defaultNode,
-        defaultEdge: { style: { ...defaultEdge.style, _theme: theme }, type: defaultEdge.type || 'graphin-line' }, // isGraphinEdgeType ? deepMix({}, defaultEdgeStyle, defaultEdge) : defaultEdge,
-        defaultCombo: { style: { ...defaultCombo.style, _theme: theme }, type: defaultCombo.type || 'combo' }, // deepMix({}, defaultComboStyle, defaultCombo), // TODO:COMBO的样式需要内部自定义
+        defaultNode: { style: { ...defaultNode.style, defaultNodeStyle, _theme: theme }, type: defaultNode.type || 'graphin-circle' }, // isGraphinNodeType ? deepMix({}, defaultNodeStyle, defaultNode) : defaultNode,
+        defaultEdge: { style: { ...defaultEdge.style, defaultEdgeStyle, _theme: theme }, type: defaultEdge.type || 'graphin-line' }, // isGraphinEdgeType ? deepMix({}, defaultEdgeStyle, defaultEdge) : defaultEdge,
+        defaultCombo: { style: { ...defaultCombo.style, defaultComboStyle, _theme: theme }, type: defaultCombo.type || 'combo' }, // deepMix({}, defaultComboStyle, defaultCombo), // TODO:COMBO的样式需要内部自定义
         /** status 样式 */
-        nodeStateStyles, // isGraphinNodeType ? deepMix({}, defaultNodeStatusStyle, nodeStateStyles) : nodeStateSty    les,
-        edgeStateStyles, // isGraphinEdgeType ? deepMix({}, defaultEdgeStatusStyle, edgeStateStyles) : edgeStateSty    les,
-        comboStateStyles, // deepMix({}, defaultComboStatusStyle, comboStateStyles),
+        nodeStateStyles: { ...nodeStateStyles, defaultNodeStatusStyle }, // isGraphinNodeType ? deepMix({}, defaultNodeStatusStyle, nodeStateStyles) : nodeStateSty    les,
+        edgeStateStyles: { ...edgeStateStyles, defaultEdgeStatusStyle }, // isGraphinEdgeType ? deepMix({}, defaultEdgeStatusStyle, edgeStateStyles) : edgeStateSty    les,
+        comboStateStyles: { ...comboStateStyles, defaultComboStatusStyle }, // deepMix({}, defaultComboStatusStyle, comboStateStyles),
       });
 
       contextRef.theme = self.theme = { ...finalStyle, ...otherTheme } as unknown as ThemeData;
@@ -273,7 +276,7 @@ const Graphin = defineComponent({
       /** 生成API */
       contextRef.apis = ApiController(self.graph as IGraph);
 
-      self.isReady = true;
+      contextRef.isReady = true;
     };
 
     /** 初始化状态 */
@@ -398,63 +401,61 @@ const Graphin = defineComponent({
     onUnmounted(() => {
       clear();
     });
-    return {
-      graphDOM,
-      isReady: toRef(self, 'isReady'),
-      theme: toRef(self, 'theme'),
+
+    return () => {
+      const { containerId, style, modes, containerStyle, } = props
+      const { isReady, theme={} } = contextRef
+      const { background } = theme
+      return (
+        <div id={containerId || "graphin-container"} style={{
+          height: '100%',
+          width: '100%',
+          position: 'relative',
+          ...containerStyle,
+        }}>
+          <div
+            data-testid="custom-element"
+            class="graphin-core"
+            ref={graphDOM}
+            style={{
+              height: '100%',
+              width: '100%',
+              minHeight: '500px',
+              background: background ? background : undefined,
+              ...style
+            }}
+          />
+          <div class="graphin-components">
+            {/** @ts-ignore */}
+            {isReady && <div>
+              {
+                /** @ts-ignore modes 不存在的时候，才启动默认的behaviors，否则会覆盖用户自己传入的 */
+                !modes && (
+                  <div>
+                    {/* 拖拽画布 */}
+                    <DragCanvas />
+                    {/* 缩放画布 */}
+                    <ZoomCanvas />
+                    {/* 拖拽节点 */}
+                    <DragNode />
+                    {/* 点击节点 */}
+                    <DragCombo />
+                    {/* 点击节点 */}
+                    <ClickSelect />
+                    {/* 圈选节点 */}
+                    <BrushSelect />
+                  </div>
+                )
+              }
+              {slots.default ? slots.default() : null}
+              {/** resize 画布 */}
+              {graphDOM.value && <ResizeCanvas graphDOM={graphDOM.value as HTMLDivElement} />}
+            </div>}
+          </div>
+        </div>
+      )
     }
   },
-  render() {
-    const { theme, style, isReady, modes, graphDOM, containerId, containerStyle } = this;
-    return (
-      <div id={containerId || "graphin-container"} style={{
-        height: '100%',
-        width: '100%',
-        position: 'relative',
-        ...containerStyle,
-      }}>
-        <div
-          data-testid="custom-element"
-          class="graphin-core"
-          ref="graphDOM"
-          style={{
-            height: '100%',
-            width: '100%',
-            minHeight: '500px',
-            background: theme ? theme.background : undefined,
-            ...style
-          }}
-        />
-        <div class="graphin-components">
-          {/** @ts-ignore */}
-          {isReady && <div>
-            {
-              /** @ts-ignore modes 不存在的时候，才启动默认的behaviors，否则会覆盖用户自己传入的 */
-              !modes && (
-                <div>
-                  {/* 拖拽画布 */}
-                  <DragCanvas />
-                  {/* 缩放画布 */}
-                  <ZoomCanvas />
-                  {/* 拖拽节点 */}
-                  <DragNode />
-                  {/* 点击节点 */}
-                  <DragCombo />
-                  {/* 点击节点 */}
-                  <ClickSelect />
-                  {/* 圈选节点 */}
-                  <BrushSelect />
-                </div>
-              )
-            }
-            {this.$slots.default ? this.$slots.default() : null}
-            {/** resize 画布 */}
-            {graphDOM && <ResizeCanvas graphDOM={graphDOM as HTMLDivElement} />}
-          </div>}
-        </div>
-      </div>
-    )
-  }
 })
 
 export default Graphin
