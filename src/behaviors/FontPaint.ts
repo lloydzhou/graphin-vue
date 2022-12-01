@@ -1,8 +1,8 @@
 // @ts-nocheck
-import { onMounted, onUnmounted, defineComponent, ref } from 'vue'
+import { onMounted, onUnmounted, defineComponent, ref, DefineComponent } from 'vue'
 import { useContext, contextSymbol } from '../GraphinContext'
 
-const FontPaint = defineComponent({
+export const FontPaint: DefineComponent<any> = defineComponent({
   name: 'FontPaint',
   inject: [contextSymbol],
   setup () {
@@ -25,4 +25,3 @@ const FontPaint = defineComponent({
   }
 })
 
-export default FontPaint

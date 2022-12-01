@@ -1,7 +1,8 @@
 // @ts-nocheck
-import { onMounted, onUnmounted, defineComponent } from 'vue'
+import { onMounted, onUnmounted, defineComponent, DefineComponent } from 'vue'
 import { useContext, contextSymbol } from '../GraphinContext'
-const Hoverable = defineComponent({
+
+export const Hoverable: DefineComponent<{bindType: string}> = defineComponent({
   name: 'Hoverable',
   props: {
     bindType: {
@@ -51,4 +52,3 @@ const Hoverable = defineComponent({
   }
 })
 
-export default Hoverable

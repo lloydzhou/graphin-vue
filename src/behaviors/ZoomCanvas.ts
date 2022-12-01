@@ -1,4 +1,4 @@
-import useBehaviorHook from './useBehaviorHook'
+import useBehaviorHook, { BehaviorComponent } from './useBehaviorHook'
 
 const defaultConfig = {
   /** 缩放灵敏度，支持 1-10 的数值，默认灵敏度为 5； */
@@ -25,9 +25,9 @@ const defaultConfig = {
   /** 是否禁用该功能 */
   disabled: false
 }
-const ZoomCanvas = useBehaviorHook({
+export type ZoomCanvasProps = typeof defaultConfig
+export const ZoomCanvas: BehaviorComponent<ZoomCanvasProps> = useBehaviorHook<ZoomCanvasProps>({
   name: 'ZoomCanvas',
   type: 'zoom-canvas',
   defaultConfig,
 })
-export default ZoomCanvas

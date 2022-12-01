@@ -1,9 +1,9 @@
 // @ts-nocheck
-import { onMounted, onUnmounted, defineComponent } from 'vue'
+import { onMounted, onUnmounted, defineComponent, DefineComponent } from 'vue'
 import { debounce } from '@antv/util'
 import { useContext, contextSymbol } from '../GraphinContext'
 
-const ResizeCanvas = defineComponent({
+export const ResizeCanvas: DefineComponent<{graphDOM: HTMLDivElement}> = defineComponent({
   name: 'ResizeCanvas',
   props: {
     graphDOM: {
@@ -43,4 +43,3 @@ const ResizeCanvas = defineComponent({
   }
 })
 
-export default ResizeCanvas

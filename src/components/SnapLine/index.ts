@@ -1,7 +1,7 @@
 // @ts-nocheck
 import G6 from '@antv/g6';
 import { useContext, contextSymbol } from '../../GraphinContext';
-import { defineComponent, onMounted, onUnmounted, watchEffect } from 'vue';
+import { defineComponent, onMounted, onUnmounted, watchEffect, DefineComponent } from 'vue';
 
 const defaultOptions = {
   line: {
@@ -23,7 +23,7 @@ export interface SnapLineProps {
   options?: Partial<typeof defaultOptions>;
 }
 
-const SnapLine = defineComponent({
+export const SnapLine: DefineComponent<SnapLineProps> = defineComponent({
   name: 'SnapLine',
   props: {
     visible: {

@@ -3,8 +3,8 @@ import Graphin from './Graphin'
 
 //utils 工具
 import Utils from "@antv/graphin/es/utils/index"
-import Behaviors from './behaviors';
-import Components from './components';
+import * as Behaviors from './behaviors';
+import * as Components from './components';
 import GraphinContext  from './GraphinContext';
 
 import registerGraphinForce from '@antv/graphin/es/layout/inner/registerGraphinForce';

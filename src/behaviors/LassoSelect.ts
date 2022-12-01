@@ -1,5 +1,4 @@
-// @ts-nocheck
-import useBehaviorHook from './useBehaviorHook'
+import useBehaviorHook, { BehaviorComponent } from './useBehaviorHook'
 
 const DEFAULT_TRIGGER = 'shift'
 const defaultConfig = {
@@ -28,9 +27,9 @@ const defaultConfig = {
   /** 框选过程中是否选中边，默认为 true，用户配置为 false 时，则不选中边； */
   includeEdges: true
 }
-const LassoSelect = useBehaviorHook({
+export type LassoSelectProps = typeof defaultConfig
+export const LassoSelect: BehaviorComponent<LassoSelectProps> = useBehaviorHook<LassoSelectProps>({
   name: 'LassoSelect',
   type: 'lasso-select',
   defaultConfig
 })
-export default LassoSelect

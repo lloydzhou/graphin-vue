@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { defineComponent, onMounted, onUnmounted, ref, watch, toRaw, markRaw, shallowReactive } from 'vue';
+import { defineComponent, onMounted, onUnmounted, ref, watch, toRaw, markRaw, shallowReactive, h } from 'vue';
 
 import G6, { Graph as IGraph, GraphData, GraphOptions, TreeGraphData } from '@antv/g6';
 // import React, { ErrorInfo } from 'react';
@@ -8,7 +8,7 @@ import G6, { Graph as IGraph, GraphData, GraphOptions, TreeGraphData } from '@an
 import ApiController from '@antv/graphin/es/apis';
 import { ApisType } from '@antv/graphin/es/apis/types';
 /** 内置 Behaviors */
-import Behaviors from './behaviors';
+import * as Behaviors from './behaviors';
 import { DEFAULT_TREE_LATOUT_OPTIONS, TREE_LAYOUTS } from '@antv/graphin/es/consts';
 /** Context */
 // import GraphinContext from './GraphinContext';
@@ -406,54 +406,44 @@ const Graphin = defineComponent({
       const { containerId, style, modes, containerStyle, } = props
       const { isReady, theme={} } = contextRef
       const { background } = theme
-      return (
-        <div id={containerId || "graphin-container"} style={{
+      return h('div', {
+        id: containerId || "graphin-container",
+        style: {
           height: '100%',
           width: '100%',
           position: 'relative',
           ...containerStyle,
-        }}>
-          <div
-            data-testid="custom-element"
-            class="graphin-core"
-            ref={graphDOM}
-            style={{
-              height: '100%',
-              width: '100%',
-              minHeight: '500px',
-              background: background ? background : undefined,
-              ...style
-            }}
-          />
-          <div class="graphin-components">
-            {/** @ts-ignore */}
-            {isReady && <div>
-              {
-                /** @ts-ignore modes 不存在的时候，才启动默认的behaviors，否则会覆盖用户自己传入的 */
-                !modes && (
-                  <div>
-                    {/* 拖拽画布 */}
-                    <DragCanvas />
-                    {/* 缩放画布 */}
-                    <ZoomCanvas />
-                    {/* 拖拽节点 */}
-                    <DragNode />
-                    {/* 点击节点 */}
-                    <DragCombo />
-                    {/* 点击节点 */}
-                    <ClickSelect />
-                    {/* 圈选节点 */}
-                    <BrushSelect />
-                  </div>
-                )
-              }
-              {slots.default ? slots.default() : null}
-              {/** resize 画布 */}
-              {graphDOM.value && <ResizeCanvas graphDOM={graphDOM.value as HTMLDivElement} />}
-            </div>}
-          </div>
-        </div>
-      )
+        }
+      }, h('div', {
+        'data-testid': 'custom-element',
+        'class': 'graphin-core',
+        ref: graphDOM,
+        style: {
+          height: '100%',
+          width: '100%',
+          minHeight: '500px',
+          background: background ? background : undefined,
+          ...style
+        }
+      }), h('div', {'class': 'graphin-components'}, isReady ? h('div', {}, [
+        /** @ts-ignore modes 不存在的时候，才启动默认的behaviors，否则会覆盖用户自己传入的 */
+        !modes ? h('div', {}, [
+          /* 拖拽画布 */
+          h(DragCanvas),
+          /* 缩放画布 */
+          h(ZoomCanvas),
+          /* 拖拽节点 */
+          h(DragNode),
+          /* 拖拽Combo */
+          h(DragCombo),
+          /* 点击节点 */
+          h(ClickSelect),
+          /* 圈选节点 */
+          h(BrushSelect),
+        ]) : null,
+        slots.default ? slots.default() : null,
+        graphDOM.value ? h(ResizeCanvas, {graphDOM: graphDOM.value as HTMLDivElement}) : null,
+      ]) : null))
     }
   },
 })

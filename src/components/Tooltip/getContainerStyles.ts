@@ -1,6 +1,6 @@
 import type { TooltipProps } from './index';
 
-const getContainerStyles = ({
+export const getContainerStyles = ({
   placement,
   nodeSize,
   x,

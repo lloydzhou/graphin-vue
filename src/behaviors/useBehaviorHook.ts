@@ -1,26 +1,21 @@
 // @ts-nocheck
 import { useContext, contextSymbol } from '../GraphinContext'
-import { defineComponent, onMounted, onUnmounted } from 'vue'
+import { defineComponent, onMounted, onUnmounted, DefineComponent } from 'vue'
 
-const useBehaviorHook = (params) => {
+export type BehaviorComponent<T> = DefineComponent<T>
+
+function useBehaviorHook<T>(params: {defaultConfig: T, name: string, type: string}): DefineComponent<T> {
   return defineComponent({
     name: params.name,
-    props: {
-      disabled: {
-        type: Boolean,
-        default: false
-      }
-    },
     inject: [contextSymbol],
     setup (props, context) {
       const {
         type,
         defaultConfig,
-        mode = 'default'
+        mode = "default"
       } = params
       const { graph } = useContext()
-      const { disabled } = props
-      const { ...otherConfig } = context.attrs
+      const { disabled, ...otherConfig } = context.attrs
 
       onMounted(() => {
         /** 保持单例 */

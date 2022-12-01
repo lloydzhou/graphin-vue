@@ -1,5 +1,4 @@
-// @ts-nocheck
-import useBehaviorHook from './useBehaviorHook'
+import useBehaviorHook, { BehaviorComponent } from './useBehaviorHook'
 
 const defaultConfig = {
   /** 是否禁用该功能 */
@@ -15,9 +14,9 @@ const defaultConfig = {
   /** 选中 Combo 的状态，默认为 selected，需要在 comboStateStyles 里面配置； */
   selectedState: 'selected'
 }
-const DragCombo = useBehaviorHook({
+export type DragComboProps = typeof defaultConfig
+export const DragCombo: BehaviorComponent<DragComboProps> = useBehaviorHook<DragComboProps>({
   name: 'DragCombo',
   type: 'drag-combo',
   defaultConfig
 })
-export default DragCombo

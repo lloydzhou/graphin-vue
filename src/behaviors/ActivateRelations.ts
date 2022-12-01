@@ -1,4 +1,4 @@
-import useBehaviorHook from './useBehaviorHook'
+import useBehaviorHook, { BehaviorComponent } from './useBehaviorHook'
 
 const defaultConfig = {
   /**
@@ -27,9 +27,9 @@ const defaultConfig = {
    */
   resetSelected: false
 }
-const ActivateRelations = useBehaviorHook({
+export type ActivateRelationsProps = typeof defaultConfig
+export const ActivateRelations: BehaviorComponent<ActivateRelationsProps> = useBehaviorHook<ActivateRelationsProps>({
   name: 'ActivateRelations',
   type: 'activate-relations',
   defaultConfig
 })
-export default ActivateRelations
