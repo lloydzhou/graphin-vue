@@ -19,6 +19,9 @@ yarn add antv-graphin-vue @antv/graphin
 
 ## Example
 
+[online demo](https://codesandbox.io/s/graphin-vue-demo-460uf7)
+
+
 这个是使用jsx实现的vue版本的示例
 ```
 import { defineComponent, reactive } from 'vue'
