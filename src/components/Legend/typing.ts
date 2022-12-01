@@ -1,3 +1,4 @@
+import { CSSProperties } from 'vue'
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export interface LegendProps {
   /** 绑定的类型 */
@@ -14,9 +15,7 @@ export interface LegendProps {
   /**
    * @description 样式
    */
-  style?: React.CSSProperties;
-
-  children: (props: LegendChildrenProps) => React.ReactNode;
+  style?: CSSProperties;
 }
 export interface OptionType {
   /** 颜色 */

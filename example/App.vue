@@ -86,7 +86,7 @@ import '@antv/graphin-icons/dist/index.css';
 // import Graphin from './Graphin'
 // import Behaviors from './behaviors'
 // import Graphin, { Behaviors } from '../dist/index.es'
-import Graphin, { Behaviors, Components, registerFontFamily } from './index'
+import Graphin, { Behaviors, Components, registerFontFamily } from '../lib/index'
 const {
   /** 内置 */
   DragCanvas,

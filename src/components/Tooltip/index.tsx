@@ -4,13 +4,6 @@ import getContainerStyles from './getContainerStyles';
 import useTooltip from './useTooltip'
 import '@antv/graphin/es/components/Tooltip/index.css'
 
-export interface TooltipValue {
-  bindType: 'node' | 'edge';
-  item: State['item'];
-  id: string;
-  model: ModelConfig;
-}
-
 const defaultStyle: CSSProperties = {
   width: '120px',
   boxShadow: '0 4px 12px rgb(0 0 0 / 15%)',
