@@ -44,9 +44,6 @@ const styles: {
   },
 };
 
-const containerRef: null | HTMLDivElement = null;
-const containerHeight = 120;
-
 const MiniMap = defineComponent({
   name: 'MiniMap',
   props: {
@@ -72,6 +69,10 @@ const MiniMap = defineComponent({
       ...style,
     };
     const miniMap = ref()
+    // const containerRef: null | HTMLDivElement = null;
+    const containerRef = ref<HTMLDivElement | null>();
+    const containerHeight = 120;
+
     onMounted(() => {
       const width = graph.getWidth();
       const height = graph.getHeight();
@@ -80,7 +81,7 @@ const MiniMap = defineComponent({
       const containerSize = [((width - padding * 2) / (height - padding * 2)) * containerHeight, containerHeight];
 
       const miniMapOptions = {
-        container: containerRef,
+        container: containerRef.value,
         ...defaultOptions,
         size: containerSize,
         ...options,
@@ -96,7 +97,7 @@ const MiniMap = defineComponent({
       }
     })
     return () => h('div', {
-      ref: containerRef.value,
+      ref: containerRef,
       style: mergedStyle
     })
   }

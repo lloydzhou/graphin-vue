@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { defineComponent, onMounted, onUnmounted, ref, watch, toRaw, markRaw, shallowReactive } from 'vue';
+import { defineComponent, onMounted, onUnmounted, ref, watch, toRaw, markRaw, shallowReactive, h } from 'vue';
 
 import G6, { Graph as IGraph, GraphData, GraphOptions, TreeGraphData } from '@antv/g6';
 // import React, { ErrorInfo } from 'react';
@@ -417,7 +417,7 @@ const Graphin = defineComponent({
       }, h('div', {
         'data-testid': 'custom-element',
         'class': 'graphin-core',
-        ref: graphDOM.value,
+        ref: graphDOM,
         style: {
           height: '100%',
           width: '100%',

@@ -1,8 +1,7 @@
 // @ts-no-check
-import { onMounted, onUnmounted, toRefs, reactive, ref } from 'vue'
+import { onMounted, onUnmounted, toRefs, shallowReactive, ref } from 'vue'
 import { IG6GraphEvent } from '@antv/g6'
 import { useContext } from '../../GraphinContext';
-import useState from '../../state'
 
 export interface Props {
   bindType?: 'node' | 'edge';
@@ -25,12 +24,12 @@ const useTooltip = (props: Props) => {
   // @ts-ignore
   const { graph } = useContext();
 
-  const [state, setState] = useState({
+  const state = shallowReactive({
     visible: false,
     x: 0,
     y: 0,
     item: null,
-  })
+  } as State)
 
   const timer = ref()
 
@@ -59,43 +58,27 @@ const useTooltip = (props: Props) => {
     }
 
     /** 设置变量 */
-    // @ts-ignore
-    setState(preState => {
-      return {
-        ...preState,
-        visible: true,
-        item: e.item,
-        x,
-        y,
-      };
-    })
+    state.visible = true
+    state.item = e.item
+    state.x = x
+    state.y = y
   };
   const handleClose = () => {
     if (timer.value) {
       clearTimeout(timer.value)
     }
     timer.value = setTimeout(() => {
-      // @ts-ignore
-      setState(preState => {
-        return {
-          ...preState,
-          visible: false,
-          item: null,
-          x: 0,
-          y: 0,
-        };
-      })
+      state.visible = false
+      state.x = 0
+      state.y = 0
     }, 200)
   };
 
   const handleDragStart = () => {
-    setState({
-      ...state,
-      visible: false,
-      x: 0,
-      y: 0,
-      item: null,
-    })
+    state.visible = false
+    state.x = 0
+    state.y = 0
+    state.item = null
   };
 
   const handleDragEnd = (e: IG6GraphEvent) => {
@@ -113,13 +96,10 @@ const useTooltip = (props: Props) => {
         x = x - daltX;
         y = y - daltY;
       }
-      setState({
-        ...state,
-        visible: true,
-        x,
-        y,
-        item: e.item,
-      })
+
+      state.visible = true
+      state.x = x
+      state.y = y
     }
   };
 
