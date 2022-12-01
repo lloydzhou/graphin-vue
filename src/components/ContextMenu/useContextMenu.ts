@@ -16,11 +16,11 @@ export interface State {
   y: number;
   /** 触发的元素 */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  item: IG6GraphEvent['item'];
+  item?: IG6GraphEvent['item'];
   /** 只有绑定canvas的时候才触发 */
   selectedItems: IG6GraphEvent['item'][];
-  onClose?: any;
-  onShow?: any;
+  onClose?: () => void;
+  onShow?: (e: IG6GraphEvent) => void;
 }
 
 const useContextMenu = (props: ContextMenuProps) => {
@@ -32,11 +32,8 @@ const useContextMenu = (props: ContextMenuProps) => {
     visible: false,
     x: 0,
     y: 0,
-    item: null,
     selectedItems: [],
-    onClose: () => null,
-    onShow: () => null,
-  })
+  } as State)
 
   const handleShow = state.onShow = (e: IG6GraphEvent) => {
     e.preventDefault();
