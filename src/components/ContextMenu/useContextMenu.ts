@@ -1,7 +1,6 @@
-import { onMounted, onUnmounted, toRefs, reactive } from 'vue'
+import { onMounted, onUnmounted, toRefs, shallowReactive } from 'vue'
 import { IG6GraphEvent } from '@antv/g6'
 import { useContext } from '../../GraphinContext';
-import useState from '../../state'
 
 export interface ContextMenuProps {
   bindType?: 'node' | 'edge' | 'canvas';
@@ -20,6 +19,8 @@ export interface State {
   item: IG6GraphEvent['item'];
   /** 只有绑定canvas的时候才触发 */
   selectedItems: IG6GraphEvent['item'][];
+  onClose?: any;
+  onShow?: any;
 }
 
 const useContextMenu = (props: ContextMenuProps) => {
@@ -27,15 +28,17 @@ const useContextMenu = (props: ContextMenuProps) => {
   // @ts-ignore
   const { graph } = useContext();
 
-  const [state, setState] = useState({
+  const state = shallowReactive({
     visible: false,
     x: 0,
     y: 0,
     item: null,
     selectedItems: [],
-  } as State)
+    onClose: () => null,
+    onShow: () => null,
+  })
 
-  const handleShow = (e: IG6GraphEvent) => {
+  const handleShow = state.onShow = (e: IG6GraphEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
@@ -78,37 +81,19 @@ const useContextMenu = (props: ContextMenuProps) => {
     }
 
     /** 设置变量 */
-    setState((preState: State) => {
-      return {
-        ...preState,
-        visible: true,
-        x,
-        y,
-        item: e.item,
-      };
-    })
+    state.visible = true
+    state.x = x
+    state.y = y
+    state.item = e.item
   };
-  const handleClose = () => {
-    setState((preState: State) => {
-      if (preState.visible) {
-        return {
-          ...preState,
-          visible: false,
-          x: 0,
-          y: 0,
-        };
-      }
-      return preState;
-    })
+  const handleClose = state.onClose = () => {
+    state.visible = false
+    state.x = 0
+    state.y = 0
   };
 
   const handleSaveAllItem = (e: IG6GraphEvent) => {
-    setState((preState: State) => {
-      return {
-        ...preState,
-        selectedItems: e.selectedItems as IG6GraphEvent['item'][],
-      };
-    });
+    state.selectedItems = e.selectedItems as IG6GraphEvent['item'][]
   }
 
   onMounted(() => {
@@ -133,11 +118,7 @@ const useContextMenu = (props: ContextMenuProps) => {
     graph.off('nodeselectchange', handleSaveAllItem);
   })
 
-  return {
-    ...toRefs(state),
-    oneShow: handleShow,
-    onClose: handleClose,
-  };
+  return state
 };
 
 export default useContextMenu;
