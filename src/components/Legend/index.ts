@@ -14,22 +14,15 @@ const defaultStyle: CSSProperties = {
 function Legend(props, { slots }) {
   const { bindType = 'node', sortKey, style } = props;
   const { dataMap, options } = useLegend({ bindType, sortKey })
-  return (
-    <div
-      className="graphin-components-legend"
-      // @ts-ignore
-      style={{ ...defaultStyle, ...style }}
-    >
-      {slots.default && slots.default({
-        bindType,
-        sortKey,
-        // @ts-ignore
-        dataMap: dataMap.value,
-        // @ts-ignore
-        options: options.value,
-      })}
-    </div>
-  )
+  return () => h('div', {
+    class: 'graphin-components-legend',
+    style: { ...defaultStyle, ...style },
+  }, slots.default && slots.default({
+    bindType,
+    sortKey,
+    dataMap: dataMap.value,
+    options: options.value,
+  }))
 }
 
 Legend.props = ['bindType', 'sortKey', 'style']

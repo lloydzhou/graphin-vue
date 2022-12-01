@@ -1,8 +1,7 @@
 // @ts-no-check
-import { onMounted, onUnmounted, toRefs, reactive, ref, watchEffect } from 'vue'
+import { onMounted, onUnmounted, toRefs, shallowReactive, ref, watchEffect } from 'vue'
 import { IG6GraphEvent } from '@antv/g6'
 import { useContext } from '../../GraphinContext';
-import useState from '../../state'
 import { LegendProps } from './typing'
 import { getEnumValue, getEnumDataMap } from '@antv/graphin/es/utils/processGraphData';
 
@@ -10,7 +9,11 @@ const useLegend = (props: LegendProps) => {
   const { bindType = 'node', sortKey } = props;
   // @ts-ignore
   const { graph } = useContext();
-  const [state, setState] = useState({ dataMap: new Map(), options: {}, data: {} })
+  const state = shallowReactive({
+    dataMap: new Map(),
+    options: {},
+    data: {}
+  })
 
   watchEffect(() => {
     const data = graph.save();
@@ -18,10 +21,8 @@ const useLegend = (props: LegendProps) => {
     /** 暂时不支持treeGraph的legend */
     if (data.children) {
       console.error('not support tree graph');
-      setState({
-        dataMap: new Map(),
-        options: {},
-      })
+      state.dataMap = new Map()
+      state.options = {}
     } else {
       // @ts-ignore
       const dataMap = getEnumDataMap(data[`${bindType}s`], sortKey);
@@ -46,10 +47,11 @@ const useLegend = (props: LegendProps) => {
           checked: true,
         };
       });
-      setState({ dataMap, options })
+      state.dataMap = dataMap
+      state.options = options
     }
   })
-  return toRefs(state)
+  return state
 };
 export default useLegend;
 
