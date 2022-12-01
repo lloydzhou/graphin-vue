@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { defineComponent, CSSProperties, ref, watchEffect, toRaw } from 'vue';
+import { defineComponent, CSSProperties, ref, watchEffect, toRaw, h } from 'vue';
 import Node from './Node';
 import type { LegendProps } from './typing';
 import useLegend from './useLegend';
@@ -11,21 +11,26 @@ const defaultStyle: CSSProperties = {
   right: '0px',
 };
 
-function Legend(props, { slots }) {
-  const { bindType = 'node', sortKey, style } = props;
-  const { dataMap, options } = useLegend({ bindType, sortKey })
-  return () => h('div', {
-    class: 'graphin-components-legend',
-    style: { ...defaultStyle, ...style },
-  }, slots.default && slots.default({
-    bindType,
-    sortKey,
-    dataMap: dataMap.value,
-    options: options.value,
-  }))
-}
+const Legend = defineComponent({
+  name: 'Legend',
+  props: ['bindType', 'sortKey', 'style'],
+  setup(props, { slots }) {
+    const { bindType = 'node', sortKey, style } = props;
+    const legend = useLegend({ bindType, sortKey })
+    return () => {
+      const { dataMap, options=[] } = legend
+      return h('div', {
+        class: 'graphin-components-legend',
+        style: { ...defaultStyle, ...style },
+      }, slots.default && slots.default({
+        bindType,
+        sortKey,
+        dataMap,
+        options,
+      }))
+    }
+  }
+})
 
-Legend.props = ['bindType', 'sortKey', 'style']
+export default Legend
 
-Legend.Node = Node;
-export default Legend;

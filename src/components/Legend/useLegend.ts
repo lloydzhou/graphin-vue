@@ -1,5 +1,5 @@
 // @ts-no-check
-import { onMounted, onUnmounted, toRefs, shallowReactive, ref, watchEffect } from 'vue'
+import { onMounted, onUnmounted, toRefs, shallowReactive, ref } from 'vue'
 import { IG6GraphEvent } from '@antv/g6'
 import { useContext } from '../../GraphinContext';
 import { LegendProps } from './typing'
@@ -11,18 +11,17 @@ const useLegend = (props: LegendProps) => {
   const { graph } = useContext();
   const state = shallowReactive({
     dataMap: new Map(),
-    options: {},
+    options: [],
     data: {}
   })
-
-  watchEffect(() => {
+  const calcDataMap = () => {
     const data = graph.save();
 
     /** 暂时不支持treeGraph的legend */
     if (data.children) {
       console.error('not support tree graph');
       state.dataMap = new Map()
-      state.options = {}
+      state.options = []
     } else {
       // @ts-ignore
       const dataMap = getEnumDataMap(data[`${bindType}s`], sortKey);
@@ -48,9 +47,18 @@ const useLegend = (props: LegendProps) => {
         };
       });
       state.dataMap = dataMap
+      // @ts-ignore
       state.options = options
     }
+  }
+
+  onMounted(() => {
+    graph.on('aftergraphrefreshposition', calcDataMap)
   })
+  onUnmounted(() => {
+    graph.off('aftergraphrefreshposition', calcDataMap)
+  })
+
   return state
 };
 export default useLegend;

@@ -115,10 +115,10 @@ const {
   SnapLine,
   Tooltip,
   Legend,
+  LegendNode,
 } = Components;
 
 const MenuItem = Menu.Item
-const LegendNode = Legend.Node
 
 const icons = registerFontFamily(iconsLoader);
 const Color = {

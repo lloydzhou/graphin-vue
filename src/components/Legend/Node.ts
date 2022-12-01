@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { defineComponent, watch, toRefs, Fragment } from 'vue';
+import { defineComponent, watch, shallowReactive, h, Fragment } from 'vue';
 import '@antv/graphin/es/components/Legend/index.css'
 import { useContext } from '../../GraphinContext';
 import deepEqual from '@antv/graphin/es/utils/deepEqual';
@@ -17,7 +17,7 @@ const LegendNode = defineComponent({
   },
   setup(props, { slots }) {
     const { graph, theme } = useContext()
-    const { mode } = theme;
+    const { mode='light' } = theme;
 
     const state = shallowReactive({
       items: props.options
@@ -46,7 +46,7 @@ const LegendNode = defineComponent({
     };
 
     return () => {
-      return h('ul', {class: 'graphin-components-legend-content'}, items.map((option: OptionType, index: number) => {
+      return h('ul', {class: 'graphin-components-legend-content'}, state.items.map((option: OptionType, index: number) => {
         const { label, checked, color } = option;
         const dotColors = {
           light: {
@@ -79,7 +79,7 @@ const LegendNode = defineComponent({
           labelColor: labelColor[mode][status],
           label,
           option,
-          data: dataMap.get(option.value),
+          data: props.dataMap.get(option.value),
         }) : h(Fragment, {}, [
           h('span', {class: 'dot', style: {background: dotColors[mode][status] }}),
           h('span', {class: 'label', style: {color: labelColor[mode][status] }}, label),
