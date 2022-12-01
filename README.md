@@ -16,7 +16,7 @@
 
 > 这个仓库现在已经发布到npmjs上面
 ```
-yarn add antv-graphin-vue
+yarn add antv-graphin-vue @antv/graphin
 ```
 这个是使用jsx实现的vue版本的示例
 ```
