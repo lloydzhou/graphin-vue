@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { defineComponent, CSSProperties, onMounted, onUnmounted, ref } from 'vue';
+import { defineComponent, CSSProperties, onMounted, onUnmounted, ref, h } from 'vue';
 import G6 from '@antv/g6'
 import { useContext, contextSymbol } from '../../GraphinContext'
 
@@ -44,7 +44,7 @@ const styles: {
   },
 };
 
-let containerRef: null | HTMLDivElement = null;
+const containerRef: null | HTMLDivElement = null;
 const containerHeight = 120;
 
 const MiniMap = defineComponent({
@@ -95,15 +95,10 @@ const MiniMap = defineComponent({
         graph.removePlugin(miniMap.value);
       }
     })
-    return () => (
-      <div
-        ref={node => {
-          containerRef = node;
-        }}
-        // @ts-ignore
-        style={mergedStyle}
-      />
-    )
+    return () => h('div', {
+      ref: containerRef.value,
+      style: mergedStyle
+    })
   }
 });
 
