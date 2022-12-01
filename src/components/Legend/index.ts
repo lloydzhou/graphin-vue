@@ -1,9 +1,9 @@
 // @ts-nocheck
-import { defineComponent, CSSProperties, ref, watchEffect, toRaw, h } from 'vue';
-import Node from './Node';
+import { defineComponent, CSSProperties, ref, watchEffect, toRaw, h, DefineComponent } from 'vue';
 import type { LegendProps } from './typing';
 import useLegend from './useLegend';
 import { useContext, contextSymbol } from '../../GraphinContext'
+import type LegendProps from './typing'
 
 const defaultStyle: CSSProperties = {
   position: 'absolute',
@@ -11,7 +11,7 @@ const defaultStyle: CSSProperties = {
   right: '0px',
 };
 
-const Legend = defineComponent({
+export const Legend: DefineComponent<LegendProps> = defineComponent({
   name: 'Legend',
   props: ['bindType', 'sortKey', 'style'],
   setup(props, { slots }) {
@@ -31,6 +31,9 @@ const Legend = defineComponent({
     }
   }
 })
+
+export * from './Node';
+export * from './useLegend';
 
 export default Legend
 

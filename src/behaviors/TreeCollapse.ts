@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { onMounted, onUnmounted, defineComponent } from 'vue'
+import { onMounted, onUnmounted, defineComponent, DefineComponent } from 'vue'
 import { useContext, contextSymbol } from '../GraphinContext'
 
 const defaultConfig = {
@@ -13,7 +13,9 @@ const defaultConfig = {
 }
 const type = 'collapse-expand'
 const mode = 'default'
-const TreeCollapse = defineComponent({
+
+export type TreeCollapseProps = {disabled: boolean, onChange: any } & typeof defaultConfig
+export const TreeCollapse: DefineComponent<TreeCollapseProps> = defineComponent({
   name: 'TreeCollapse',
   props: {
     disabled: {
@@ -64,4 +66,3 @@ const TreeCollapse = defineComponent({
     return () => null
   }
 })
-export default TreeCollapse

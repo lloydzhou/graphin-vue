@@ -1,5 +1,5 @@
 // @ts-nocheck
-import useBehaviorHook from './useBehaviorHook'
+import useBehaviorHook, { BehaviorComponent } from './useBehaviorHook'
 
 const DEFAULT_TRIGGER = 'shift'
 // const ALLOW_EVENTS = ['shift', 'ctrl', 'alt', 'control'];
@@ -13,9 +13,9 @@ const defaultConfig = {
   /** 选中的样式，默认为 selected */
   selectedState: 'selected'
 }
-const ClickSelect = useBehaviorHook({
+export type ClickSelectProps = typeof defaultConfig
+export const ClickSelect: BehaviorComponent<ClickSelectProps> = useBehaviorHook<ClickSelectProps>({
   name: 'ClickSelect',
   type: 'click-select',
   defaultConfig
 })
-export default ClickSelect

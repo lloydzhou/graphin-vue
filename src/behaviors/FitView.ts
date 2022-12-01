@@ -1,8 +1,8 @@
 // @ts-nocheck
-import { defineComponent, onMounted, onUnmounted } from 'vue'
+import { defineComponent, onMounted, onUnmounted, DefineComponent } from 'vue'
 import { useContext, contextSymbol } from '../GraphinContext'
 
-const FitView = defineComponent({
+export const FitView: DefineComponent<{padding: Array, isBindLayoutChange: boolean}> = defineComponent({
   name: 'FitView',
   props: {
     padding: {
@@ -43,4 +43,3 @@ const FitView = defineComponent({
   }
 })
 
-export default FitView

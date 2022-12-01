@@ -1,4 +1,4 @@
-import { onMounted, onUnmounted, toRefs, shallowReactive } from 'vue'
+import { onMounted, onUnmounted, toRefs, shallowReactive, CSSProperties } from 'vue'
 import { IG6GraphEvent } from '@antv/g6'
 import { useContext } from '../../GraphinContext';
 
@@ -6,10 +6,11 @@ export interface ContextMenuProps {
   bindType?: 'node' | 'edge' | 'canvas';
   bindEvent?: 'click' | 'contextmenu';
   // container: React.RefObject<HTMLDivElement>;
-  container: any;  // ref
+  container?: any;  // ref
+  style?: CSSProperties;  // ref
 }
 
-export interface State {
+export interface ContextMenuState {
   /** 当前状态 */
   visible: boolean;
   x: number;
@@ -23,7 +24,7 @@ export interface State {
   onShow?: (e: IG6GraphEvent) => void;
 }
 
-const useContextMenu = (props: ContextMenuProps) => {
+export const useContextMenu = (props: ContextMenuProps) => {
   const { bindType = 'node', bindEvent='contextmenu', container } = props;
   // @ts-ignore
   const { graph } = useContext();
@@ -33,7 +34,7 @@ const useContextMenu = (props: ContextMenuProps) => {
     x: 0,
     y: 0,
     selectedItems: [],
-  } as State)
+  } as ContextMenuState)
 
   const handleShow = state.onShow = (e: IG6GraphEvent) => {
     e.preventDefault();

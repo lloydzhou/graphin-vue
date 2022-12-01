@@ -1,15 +1,15 @@
 // @ts-nocheck
-import { defineComponent, CSSProperties, ref, h } from 'vue';
+import { defineComponent, CSSProperties, ref, h, DefineComponent } from 'vue';
 import '@antv/graphin/es/components/ContextMenu/index.css'
 
-import useContextMenu from './useContextMenu'
+import { useContextMenu, ContextMenuProps } from './useContextMenu'
 
 const defaultStyle: CSSProperties = {
   width: '120px',
   boxShadow: '0 4px 12px rgb(0 0 0 / 15%)',
 };
 
-const ContextMenu = defineComponent({
+export const ContextMenu: DefineComponent<ContextMenuProps> = defineComponent({
   name: 'ContextMenu',
   props: {
     bindType: {
@@ -60,5 +60,6 @@ const ContextMenu = defineComponent({
   }
 })
 
+export * from './useContextMenu'
 export default ContextMenu;
 

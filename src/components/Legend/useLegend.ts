@@ -5,7 +5,7 @@ import { useContext } from '../../GraphinContext';
 import { LegendProps } from './typing'
 import { getEnumValue, getEnumDataMap } from '@antv/graphin/es/utils/processGraphData';
 
-const useLegend = (props: LegendProps) => {
+export const useLegend = (props: LegendProps) => {
   const { bindType = 'node', sortKey } = props;
   // @ts-ignore
   const { graph } = useContext();

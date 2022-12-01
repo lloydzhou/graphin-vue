@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { defineComponent, CSSProperties, onMounted, onUnmounted, ref, h } from 'vue';
+import { defineComponent, CSSProperties, onMounted, onUnmounted, ref, h, DefineComponent } from 'vue';
 import G6 from '@antv/g6'
 import { useContext, contextSymbol } from '../../GraphinContext'
 
@@ -17,6 +17,7 @@ const defaultOptions = {
   },
   refresh: true,
 };
+
 export interface MiniMapProps {
   /**
    * @description 是否开启
@@ -31,6 +32,7 @@ export interface MiniMapProps {
 
   style?: CSSProperties;
 }
+
 const styles: {
   [key: string]: CSSProperties;
 } = {
@@ -44,7 +46,7 @@ const styles: {
   },
 };
 
-const MiniMap = defineComponent({
+export const MiniMap: DefineComponent<MiniMapProps> = defineComponent({
   name: 'MiniMap',
   props: {
     style: {

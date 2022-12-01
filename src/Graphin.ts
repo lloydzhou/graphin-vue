@@ -8,7 +8,7 @@ import G6, { Graph as IGraph, GraphData, GraphOptions, TreeGraphData } from '@an
 import ApiController from '@antv/graphin/es/apis';
 import { ApisType } from '@antv/graphin/es/apis/types';
 /** 内置 Behaviors */
-import Behaviors from './behaviors';
+import * as Behaviors from './behaviors';
 import { DEFAULT_TREE_LATOUT_OPTIONS, TREE_LAYOUTS } from '@antv/graphin/es/consts';
 /** Context */
 // import GraphinContext from './GraphinContext';

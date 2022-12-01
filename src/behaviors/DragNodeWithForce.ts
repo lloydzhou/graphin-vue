@@ -1,8 +1,8 @@
 // @ts-nocheck
-import { onMounted, onUnmounted, defineComponent } from 'vue'
+import { onMounted, onUnmounted, defineComponent, DefineComponent } from 'vue'
 import { useContext, contextSymbol } from '../GraphinContext'
 
-const DragNodeWithForce = defineComponent({
+export const DragNodeWithForce: DefineComponent<{autoPin: boolean}> = defineComponent({
   name: 'DragNodeWithForce',
   props: {
     autoPin: {
@@ -61,4 +61,3 @@ const DragNodeWithForce = defineComponent({
   }
 })
 
-export default DragNodeWithForce

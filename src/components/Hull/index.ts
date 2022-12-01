@@ -1,7 +1,7 @@
 // @ts-nocheck
 import G6 from '@antv/g6';
 import { useContext, contextSymbol } from '../../GraphinContext';
-import { defineComponent, onMounted, onUnmounted, ref, watch } from 'vue';
+import { defineComponent, onMounted, onUnmounted, ref, watch, DefineComponent } from 'vue';
 import { debounce } from '@antv/util'
 
 const defaultHullCfg = {
@@ -89,7 +89,7 @@ export interface IHullProps {
   options: HullCfg[];
 }
 
-const Hull = defineComponent({
+export const Hull: DefineComponent<IHullProps> = defineComponent({
   name: 'Hull',
   props: {
     options: {

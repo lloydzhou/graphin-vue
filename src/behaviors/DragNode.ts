@@ -1,5 +1,4 @@
-// @ts-nocheck
-import useBehaviorHook from './useBehaviorHook'
+import useBehaviorHook, { BehaviorComponent } from './useBehaviorHook'
 
 const defaultConfig = {
   /**
@@ -38,9 +37,8 @@ const defaultConfig = {
    */
   selectedState: 'selected'
 }
-const DragNode = useBehaviorHook({
+export const DragNode: BehaviorComponent<typeof defaultConfig> = useBehaviorHook<typeof defaultConfig>({
   name: 'DragNode',
   type: 'drag-node',
   defaultConfig
 })
-export default DragNode

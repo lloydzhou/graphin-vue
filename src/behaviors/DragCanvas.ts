@@ -1,5 +1,4 @@
-// @ts-nocheck
-import useBehaviorHook from './useBehaviorHook'
+import useBehaviorHook, { BehaviorComponent } from './useBehaviorHook'
 
 const defaultConfig = {
   /** 允许拖拽方向，支持'x'，'y'，'both'，默认方向为 'both'； */
@@ -20,9 +19,9 @@ const defaultConfig = {
   /** 是否禁用该功能 */
   disabled: false
 }
-const DragCanvas = useBehaviorHook({
+export type DragCanvasProps = typeof defaultConfig
+export const DragCanvas: BehaviorComponent<DragCanvasProps> = useBehaviorHook<DragCanvasProps>({
   name: 'DragCanvas',
   type: 'drag-canvas',
   defaultConfig
 })
-export default DragCanvas

@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { defineComponent, CSSProperties, ref, h } from 'vue';
+import { defineComponent, CSSProperties, ref, h, DefineComponent } from 'vue';
 import getContainerStyles from './getContainerStyles';
 import useTooltip from './useTooltip'
 import '@antv/graphin/es/components/Tooltip/index.css'
@@ -35,7 +35,7 @@ export interface TooltipProps {
   hasArrow?: boolean;
 }
 
-const Tooltip = defineComponent({
+export const Tooltip: DefineComponent<TooltipProps> = defineComponent({
   name: 'Tooltip',
   props: {
     bindType: {
@@ -105,5 +105,6 @@ const Tooltip = defineComponent({
   }
 })
 
+export * from './useTooltip'
 export default Tooltip;
 

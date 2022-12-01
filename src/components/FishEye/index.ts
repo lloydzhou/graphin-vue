@@ -1,7 +1,7 @@
 // @ts-nocheck
 import G6 from '@antv/g6';
 import { useContext, contextSymbol } from '../../GraphinContext';
-import { defineComponent, onMounted, onUnmounted, ref } from 'vue';
+import { defineComponent, onMounted, onUnmounted, ref, DefineComponent } from 'vue';
 
 const defaultOptions = {
   r: 249,
@@ -39,7 +39,7 @@ export interface FishEyeProps {
 }
 
 
-const FishEye = defineComponent({
+export const FishEye: DefineComponent<FishEyeProps> = defineComponent({
   name: 'FishEye',
   props: {
     handleEscListener: {

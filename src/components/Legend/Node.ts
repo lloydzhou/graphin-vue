@@ -1,11 +1,11 @@
 // @ts-nocheck
-import { defineComponent, watch, shallowReactive, h, Fragment } from 'vue';
+import { defineComponent, watch, shallowReactive, h, Fragment, DefineComponent } from 'vue';
 import '@antv/graphin/es/components/Legend/index.css'
 import { useContext } from '../../GraphinContext';
 import deepEqual from '@antv/graphin/es/utils/deepEqual';
+import type LegendChildrenProps from './typing'
 
-
-const LegendNode = defineComponent({
+export const LegendNode: DefineComponent<LegendChildrenProps> = defineComponent({
   name: 'LegendNode',
   props: {
     options: {

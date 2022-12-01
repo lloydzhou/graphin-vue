@@ -1,5 +1,5 @@
 // @ts-nocheck
-import useBehaviorHook from './useBehaviorHook'
+import useBehaviorHook, { BehaviorComponent } from './useBehaviorHook'
 
 const DEFAULT_TRIGGER = 'shift'
 const defaultConfig = {
@@ -28,9 +28,10 @@ const defaultConfig = {
   /** 框选过程中是否选中边，默认为 true，用户配置为 false 时，则不选中边； */
   includeEdges: true
 }
-const BrushSelect = useBehaviorHook({
+
+export type BrushSelectProps = typeof defaultConfig
+export const BrushSelect: BehaviorComponent<BrushSelectProps> = useBehaviorHook<BrushSelectProps>({
   name: 'BrushSelect',
   type: 'brush-select',
   defaultConfig
 })
-export default BrushSelect

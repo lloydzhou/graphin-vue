@@ -19,7 +19,7 @@ export interface State {
   item: IG6GraphEvent['item'];
 }
 
-const useTooltip = (props: Props) => {
+export const useTooltip = (props: Props) => {
   const { bindType = 'node', container } = props;
   // @ts-ignore
   const { graph } = useContext();
