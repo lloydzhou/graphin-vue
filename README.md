@@ -12,12 +12,13 @@
 
 2. 使用vue重写ui组件以及behaviors组件以及components组件
 
-## Example
-
-> 这个仓库现在已经发布到npmjs上面
+## Install
 ```
 yarn add antv-graphin-vue @antv/graphin
 ```
+
+## Example
+
 这个是使用jsx实现的vue版本的示例
 ```
 import { defineComponent, reactive } from 'vue'
@@ -53,30 +54,4 @@ export default App
 
 ```
 
-
-## Project setup
-```
-yarn install
-```
-
-### Compiles and hot-reloads for development
-```
-yarn serve
-```
-
-### Compiles and minifies for production
-```
-yarn build
-```
-
-### Lints and fixes files
-```
-yarn lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
-
-## 感谢
-前端UI组件代码有参考[vue-graphin](https://www.npmjs.com/package/vue-graphin)这个库里面的代码逻辑，感谢@hugoyang
 
