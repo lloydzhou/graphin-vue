@@ -427,7 +427,7 @@ const Graphin = defineComponent({
         }
       }), h('div', {'class': 'graphin-components'}, isReady ? h('div', {}, [
         /** @ts-ignore modes 不存在的时候，才启动默认的behaviors，否则会覆盖用户自己传入的 */
-        !modes ? h('div', {}, [
+        modes.default.length == 0 ? h('div', {}, [
           /* 拖拽画布 */
           h(DragCanvas),
           /* 缩放画布 */
