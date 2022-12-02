@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { defineComponent, onMounted, onUnmounted, ref, watch, toRaw, markRaw, shallowReactive, h } from 'vue';
+import { defineComponent, DefineComponent, onMounted, onUnmounted, ref, watch, toRaw, markRaw, shallowReactive, h } from 'vue';
 
 import G6, { Graph as IGraph, GraphData, GraphOptions, TreeGraphData } from '@antv/g6';
 // import React, { ErrorInfo } from 'react';
@@ -27,7 +27,7 @@ const { DragCanvas, ZoomCanvas, DragNode, DragCombo, ClickSelect, BrushSelect, R
 import {createContext} from './GraphinContext'
 
 
-const Graphin = defineComponent({
+export const Graphin: DefineComponent<GraphinProps> = defineComponent({
 
   name: "Graphin",
 
@@ -38,7 +38,7 @@ const Graphin = defineComponent({
     },
     layout: {
       type: Object,
-      default: () => ({})
+      default: () => ({} as GraphinProps['layout'])
     },
     height: {
       type: Number,
