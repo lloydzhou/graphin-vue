@@ -62,8 +62,7 @@
 </template>
 <script lang="ts">
 // @ts-nocheck
-import { defineComponent } from 'vue'
-import { Options, Vue as Component } from 'vue-class-component';
+import { defineComponent, onMounted, toRefs, reactive } from 'vue'
 import { Menu } from 'ant-design-vue';
 import 'ant-design-vue/es/menu/style/css'
 import Utils from '@antv/graphin/es/utils'
@@ -130,7 +129,7 @@ const Color = {
   },
 };
 
-@Options({
+export default defineComponent({
   components: {
     Graphin,
     ZoomCanvas,
@@ -144,8 +143,8 @@ const Color = {
     DragNode,
     Hoverable,
     LassoSelect,
-    TreeCollapse,
-    DragNodeWithForce,
+    // TreeCollapse,
+    // DragNodeWithForce,
     MiniMap,
     ContextMenu,
     Menu, MenuItem,
@@ -155,121 +154,119 @@ const Color = {
     Tooltip,
     Legend, LegendNode,
   },
-})
-export default class App extends Component {
-
-  name = 'world'
-  data = {nodes: [], edeges: []}
-  layout = {
-    type: 'graphin-force',
-    preset: {
-      type: 'grid',
-    }
-  }
-  hullOptions = [
-    {
-      members: ['node-1', 'node-2'], // 必须参数
-    },
-    {
-      members: ['node-3', 'node-4'],
-      type: 'bubble',
-      padding: 10,
-      style: {
-        fill: 'lightgreen',
-        stroke: 'green',
+  setup(props) {
+    const state = reactive({
+      name: 'world',
+      data: {nodes: [], edeges: []},
+      layout: {
+        type: 'graphin-force',
+        preset: {
+          type: 'grid',
+        }
       },
-    },
-  ]
-  snaplineOptions = {
-    line: {
-      stroke: 'lightgreen',
-      lineWidth: 0.5,
-    },
-  }
-  fishEyeVisible = false
+      hullOptions: [
+        {
+          members: ['node-1', 'node-2'], // 必须参数
+        },
+        {
+          members: ['node-3', 'node-4'],
+          type: 'bubble',
+          padding: 10,
+          style: {
+            fill: 'lightgreen',
+            stroke: 'green',
+          },
+        },
+      ],
+      snaplineOptions: {
+        line: {
+          stroke: 'lightgreen',
+          lineWidth: 0.5,
+        },
+      },
+      fishEyeVisible: false,
+    })
 
-  hendleContextMenuClick(data, event) {
-    const { onClose } = data
-    console.log('hendleContextMenuClick', data, event)
-    onClose && onClose()
-    if (event.key == 'fishEye') {
-      this.fishEyeVisible = true
+    function hendleContextMenuClick(data, event) {
+      const { onClose } = data
+      console.log('hendleContextMenuClick', data, event)
+      onClose && onClose()
+      if (event.key == 'fishEye') {
+        state.fishEyeVisible = true
+      }
     }
-  }
 
-  handleChangeHull(data, event) {
-    const { selectedItems={}, onClose } = data
-    const nodes = selectedItems.nodes || [];
-    if (nodes.length) {
-      const members = nodes.map((item: any) => {
-        return item.get('id');
-      }) as string[];
-      const newHullOptions = {
-        members,
-        type: 'bubble',
-        padding: 10,
-        style: {
-          fill: 'lightgreen',
-          stroke: 'green',
-        },
-      };
-      this.hullOptions = [{...newHullOptions}]
+    function handleChangeHull(data, event) {
+      const { selectedItems={}, onClose } = data
+      const nodes = selectedItems.nodes || [];
+      if (nodes.length) {
+        const members = nodes.map((item: any) => {
+          return item.get('id');
+        }) as string[];
+        const newHullOptions = {
+          members,
+          type: 'bubble',
+          padding: 10,
+          style: {
+            fill: 'lightgreen',
+            stroke: 'green',
+          },
+        };
+        state.hullOptions = [{...newHullOptions}]
+      }
+      onClose && onClose()
     }
-    onClose && onClose()
-  }
 
-  handleEscListener(ev) {
-    this.fishEyeVisible = false
-  }
+    function handleEscListener(ev) {
+      state.fishEyeVisible = false
+    }
 
-  processNode() {
-    this.data.nodes.forEach((node, index) => {
-      const isCompany = index % 3 === 0;
-      const iconType = isCompany ? 'company' : 'person';
-      node.data = {
-        type: iconType,
-      };
-      node.type = 'graphin-circle';
-      const { primaryColor } = Color[iconType];
-      node.style = {
-        keyshape: {
-          size: 30,
-          stroke: primaryColor,
-          fill: primaryColor,
-          fillOpacity: 0.2,
-        },
-        icon: {
-          type: 'font',
-          fontFamily: 'graphin',
-          value: isCompany ? icons.company : icons.user,
-          size: 14,
-          fill: primaryColor,
-        },
-      };
-    });
-  }
-
-  created() {
-
-    setTimeout(() => this.name = 'lloyd', 2000)
-    console.log('created', this)
-    // @ts-ignore
-    this.data = Utils.mock(8).circle().graphin()
-    this.processNode()
-    setTimeout(() => {
+    function processNode() {
+      state.data.nodes.forEach((node, index) => {
+        const isCompany = index % 3 === 0;
+        const iconType = isCompany ? 'company' : 'person';
+        node.data = {
+          type: iconType,
+        };
+        node.type = 'graphin-circle';
+        const { primaryColor } = Color[iconType];
+        node.style = {
+          keyshape: {
+            size: 30,
+            stroke: primaryColor,
+            fill: primaryColor,
+            fillOpacity: 0.2,
+          },
+          icon: {
+            type: 'font',
+            fontFamily: 'graphin',
+            value: isCompany ? icons.company : icons.user,
+            size: 14,
+            fill: primaryColor,
+          },
+        };
+      });
+    }
+    onMounted(() => {
+      setTimeout(() => state.name = 'lloyd', 2000)
       // @ts-ignore
-      this.data = Utils.mock(10).circle().graphin()
-      this.processNode()
-      console.log('update data', this.data)
-    }, 3000)
-    // setTimeout(() => {
-    //   // @ts-ignore
-    //   this.data = Utils.mock(100).circle().graphin()
-    //   console.log('update data', this.data)
-    // }, 10000)
+      state.data = Utils.mock(8).circle().graphin()
+      processNode()
+      setTimeout(() => {
+        // @ts-ignore
+        state.data = Utils.mock(10).circle().graphin()
+        processNode()
+        console.log('update data', state.data)
+      }, 3000)
+    })
+    return {
+      ...toRefs(state),
+      hendleContextMenuClick,
+      handleChangeHull,
+      handleEscListener,
+    }
   }
-
-}
+})
 </script>
 
 <style>
