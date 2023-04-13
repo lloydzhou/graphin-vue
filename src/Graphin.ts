@@ -40,6 +40,10 @@ export const Graphin: DefineComponent<GraphinProps> = defineComponent({
       type: Object,
       default: () => ({} as GraphinProps['layout'])
     },
+    plugins: {
+      type: Array,
+      default: () => ([])
+    },
     height: {
       type: Number,
       default: () => 600
@@ -122,12 +126,13 @@ export const Graphin: DefineComponent<GraphinProps> = defineComponent({
 
   setup(props, { slots }) {
 
-    const { data, layout, width, height, layoutCache, ...otherOptions } = props;
+    const { data, layout, width, height, layoutCache, plugins, ...otherOptions } = props;
 
     /** 传递给LayoutController的对象 */
     const self = markRaw({
       props,
       data,
+      plugins,
       isTree:
         Boolean(props.data && (props.data as GraphinTreeData).children) ||
         TREE_LAYOUTS.indexOf(String(layout && layout.type)) !== -1,
