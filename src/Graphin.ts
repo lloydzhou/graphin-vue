@@ -381,7 +381,7 @@ export const Graphin: DefineComponent<GraphinProps> = defineComponent({
         /** 数据需要从画布中来 */
         // @ts-ignore
         self.data = self.layout.getDataFromGraph()
-        self.layout.changeLayout();
+        self.layout.changeLayout(layout);
         self.graph.emit('graphin:layoutchange', { prevLayout: prevLayout, layout });
       },
     );
