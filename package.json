@@ -1,6 +1,6 @@
 {
   "name": "antv-graphin-vue",
-  "version": "2.6.12",
+  "version": "2.6.13",
   "description": "the vue toolkit for graph analysis based on g6, based on @antv/graphin",
   "scripts": {
     "prepare": "install-peers",
