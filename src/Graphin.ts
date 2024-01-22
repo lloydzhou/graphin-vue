@@ -150,7 +150,7 @@ export const Graphin: DefineComponent<GraphinProps> = defineComponent({
       options: { ...otherOptions } as GraphOptions,
     })
     // self.props不会同步变化
-    watch(() => props, (newProps) => self.props = {...newProps})
+    watch(() => props, (newProps) => self.props = {...newProps}, { deep: true })
 
     /** Graph的DOM */
     const graphDOM = ref<HTMLDivElement | null>(null);
@@ -382,7 +382,7 @@ export const Graphin: DefineComponent<GraphinProps> = defineComponent({
         /** 数据需要从画布中来 */
         // @ts-ignore
         self.data = self.layout.getDataFromGraph()
-        self.layout.changeLayout(layout);
+        self.layout.changeLayout();
         self.graph.emit('graphin:layoutchange', { prevLayout: prevLayout, layout });
       },
     );
