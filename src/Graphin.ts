@@ -18,10 +18,11 @@ import LayoutController from '@antv/graphin/es/layout';
 import { getDefaultStyleByTheme, ThemeData } from '@antv/graphin/es/theme/index';
 /** types  */
 import { GraphinData, GraphinProps, GraphinTreeData, IUserNode } from '@antv/graphin/es/typings/type';
-import cloneDeep from '@antv/graphin/es/utils/cloneDeep';
+// import cloneDeep from '@antv/graphin/es/utils/cloneDeep';
 /** utils */
 // import shallowEqual from './utils/shallowEqual';
-import deepEqual from '@antv/graphin/es/utils/deepEqual';
+// import deepEqual from '@antv/graphin/es/utils/deepEqual';
+import { cloneDeep, isEqual as deepEqual } from 'lodash-es';
 
 const { DragCanvas, ZoomCanvas, DragNode, DragCombo, ClickSelect, BrushSelect, ResizeCanvas } = Behaviors;
 import {createContext} from './GraphinContext'
